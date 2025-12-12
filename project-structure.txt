@@ -1,0 +1,40 @@
+📄 .gitignore
+📄 eslint.config.js
+📄 index.html
+📄 package-lock.json
+📄 package.json
+📄 postcss.config.js
+📄 project-structure.txt
+📁 public
+  📄 vite.svg
+📄 README.md
+📄 save-structure.cjs
+📁 src
+  📄 App.css
+  📄 App.tsx
+  📁 assets
+  📁 components
+    📄 ActionButtons.tsx
+    📄 BuildItCalculator.tsx
+    📄 MainPanel.tsx
+    📄 OptionCard.tsx
+    📄 PreviewTile.tsx
+    📄 ProductModelDisplay.tsx
+    📄 ProductPreview.tsx
+    📄 ShareMenu.tsx
+    📄 Sidebar.tsx
+    📄 StepSelector.tsx
+  📁 data
+    📄 steps.ts
+  📁 hooks
+    📄 useConfiguration.ts
+  📄 index.css
+  📄 main.tsx
+  📄 types.ts
+  📁 utils
+    📄 buildProductModel.ts
+    📄 filterOptions.ts
+📄 tsconfig.app.json
+📄 tsconfig.json
+📄 tsconfig.node.json
+📄 vite.config.ts
