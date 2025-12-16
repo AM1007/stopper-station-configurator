@@ -62,7 +62,7 @@ export function ProductModelDisplay({
         </span>
 
         {/* Dynamic cells based on partsOrder */}
-        {partsOrder.map((stepId, index) => {
+        {partsOrder.map((stepId) => {
           const value = parts[stepId] ?? "";
           const step = model.steps.find((s) => s.id === stepId);
           const separator = separatorMap?.[stepId] ?? "";

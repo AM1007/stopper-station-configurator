@@ -12,7 +12,7 @@
 //
 // ============================================================================
 
-import type { Configuration, ModelDefinition, StepId } from "../types";
+import type { Configuration, ModelDefinition } from "../types";
 import { PreviewTile } from "./PreviewTile";
 
 // ============================================================================
