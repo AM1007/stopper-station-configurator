@@ -13,9 +13,11 @@
   📄 App.css
   📄 App.tsx
   📁 assets
+  📄 buildProductModel.ts
   📁 components
     📄 ActionButtons.tsx
     📄 BuildItCalculator.tsx
+    📄 Layout.tsx
     📄 MainPanel.tsx
     📄 OptionCard.tsx
     📄 PreviewTile.tsx
@@ -25,11 +27,27 @@
     📄 Sidebar.tsx
     📄 StepSelector.tsx
   📁 data
+    📁 models
+      📄 index.ts
+      📄 indoorPushButtons.ts
+      📄 keySwitches.ts
+      📄 resetCallPoints.ts
+      📄 stopperStations.ts
+      📄 waterproofPushButtons.ts
+      📄 waterproofResetCallPoint.ts
     📄 steps.ts
+  📄 filterOptions.ts
   📁 hooks
     📄 useConfiguration.ts
   📄 index.css
   📄 main.tsx
+  📁 pages
+    📄 ConfiguratorPage.tsx
+    📄 HomePage.tsx
+    📄 MyListPage.tsx
+  📁 stores
+    📄 configurationStore.ts
+    📄 myListStore.ts
   📄 types.ts
   📁 utils
     📄 buildProductModel.ts

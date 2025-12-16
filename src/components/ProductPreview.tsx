@@ -2,88 +2,158 @@
 // PRODUCT PREVIEW COMPONENT
 // ============================================================================
 //
-// Grid of 6 preview tiles showing current selections:
-// - COLOUR
-// - COVER
-// - ACTIVATION
-// - TEXT
-// - LANGUAGE
-// - INSTALLATION OPTIONS
+// Grid of preview tiles showing current selections.
+// Dynamic based on model's stepOrder.
 //
-// Layout: 4 columns on first row, 2 columns on second row (responsive)
+// Layout:
+// - Mobile: 2 columns
+// - Tablet: 3 columns
+// - Desktop: 4-6 columns depending on step count
+//
 // ============================================================================
 
-import type { Configuration, StepId } from "../types";
-import { STEPS } from "../data/steps";
+import type { Configuration, ModelDefinition, StepId } from "../types";
 import { PreviewTile } from "./PreviewTile";
 
+// ============================================================================
+// TYPES
+// ============================================================================
+
 interface ProductPreviewProps {
+  /** Current model definition */
+  model: ModelDefinition;
+
   /** Current configuration state */
   config: Configuration;
 }
 
+// ============================================================================
+// HELPERS
+// ============================================================================
+
 /**
- * Tile configuration for preview grid
+ * Determines grid columns based on step count.
  */
-const PREVIEW_TILES: { stepId: StepId; label: string }[] = [
-  { stepId: "colour", label: "COLOUR" },
-  { stepId: "cover", label: "COVER" },
-  { stepId: "activation", label: "ACTIVATION" },
-  { stepId: "text", label: "TEXT" },
-  { stepId: "language", label: "LANGUAGE" },
-  { stepId: "installationOptions", label: "INSTALLATION OPTIONS" },
-];
+function getGridClasses(stepCount: number): string {
+  if (stepCount <= 3) {
+    return "grid-cols-2 md:grid-cols-3";
+  }
+  if (stepCount <= 4) {
+    return "grid-cols-2 md:grid-cols-4";
+  }
+  if (stepCount <= 5) {
+    return "grid-cols-2 md:grid-cols-3 lg:grid-cols-5";
+  }
+  // 6+ steps
+  return "grid-cols-2 md:grid-cols-3 lg:grid-cols-6";
+}
+
+// ============================================================================
+// COMPONENT
+// ============================================================================
 
 /**
  * Grid of preview tiles showing all current selections.
  *
- * Layout:
- * - First row: 4 tiles (COLOUR, COVER, ACTIVATION, TEXT)
- * - Second row: 2 tiles (LANGUAGE, INSTALLATION OPTIONS)
+ * Layout adapts to number of steps in the model:
+ * - Stopper Stations: 6 tiles
+ * - Indoor Push Buttons: 5 tiles
+ * - Key Switches: 4 tiles
+ * - etc.
  */
-export function ProductPreview({ config }: ProductPreviewProps) {
+export function ProductPreview({ model, config }: ProductPreviewProps) {
+  const gridClasses = getGridClasses(model.stepOrder.length);
+
   return (
     <div className="mb-6">
-      {/* Header tabs (Edit Selections / Product Preview) */}
-      <div className="flex gap-6 mb-4">
-        <button
-          type="button"
-          className="text-red-600 font-semibold hover:text-red-700"
-        >
-          Edit Selections
-        </button>
-        <button
-          type="button"
-          className="text-red-600 font-semibold hover:text-red-700 border-b-2 border-red-600"
-        >
-          Product Preview
-        </button>
-      </div>
-
       {/* Preview Grid */}
-      <div className="grid grid-cols-4 gap-4">
-        {PREVIEW_TILES.map((tile) => {
+      <div className={`grid ${gridClasses} gap-3 md:gap-4`}>
+        {model.stepOrder.map((stepId) => {
           // Find the step data
-          const step = STEPS.find((s) => s.id === tile.stepId);
-          
+          const step = model.steps.find((s) => s.id === stepId);
+          if (!step) return null;
+
           // Get selected option ID from config
-          const selectedOptionId = config[tile.stepId];
-          
+          const selectedOptionId = config[stepId];
+
           // Find the selected option details
-          const selectedOption = step?.options.find(
+          const selectedOption = step.options.find(
             (o) => o.id === selectedOptionId
           );
 
           return (
             <PreviewTile
-              key={tile.stepId}
-              label={tile.label}
+              key={stepId}
+              label={step.title}
               image={selectedOption?.image}
               selectedLabel={selectedOption?.label}
+              isSelected={!!selectedOptionId}
             />
           );
         })}
       </div>
+    </div>
+  );
+}
+
+// ============================================================================
+// COMPACT PREVIEW (for My List page)
+// ============================================================================
+
+interface CompactPreviewProps {
+  /** Current model definition */
+  model: ModelDefinition;
+
+  /** Current configuration state */
+  config: Configuration;
+
+  /** Max tiles to show (rest collapsed into "+N more") */
+  maxTiles?: number;
+}
+
+/**
+ * Compact version for My List items.
+ * Shows limited tiles with "+N more" indicator.
+ */
+export function CompactPreview({
+  model,
+  config,
+  maxTiles = 3,
+}: CompactPreviewProps) {
+  const visibleSteps = model.stepOrder.slice(0, maxTiles);
+  const hiddenCount = model.stepOrder.length - maxTiles;
+
+  return (
+    <div className="flex gap-2 items-center">
+      {visibleSteps.map((stepId) => {
+        const step = model.steps.find((s) => s.id === stepId);
+        const selectedOptionId = config[stepId];
+        const selectedOption = step?.options.find(
+          (o) => o.id === selectedOptionId
+        );
+
+        return (
+          <div
+            key={stepId}
+            className="w-10 h-10 bg-gray-100 rounded border border-gray-200 flex items-center justify-center overflow-hidden"
+            title={selectedOption?.label ?? step?.title}
+          >
+            {selectedOption?.image ? (
+              <img
+                src={selectedOption.image}
+                alt=""
+                className="w-full h-full object-contain"
+              />
+            ) : (
+              <span className="text-xs text-gray-400">—</span>
+            )}
+          </div>
+        );
+      })}
+
+      {hiddenCount > 0 && (
+        <span className="text-xs text-gray-500">+{hiddenCount} more</span>
+      )}
     </div>
   );
 }

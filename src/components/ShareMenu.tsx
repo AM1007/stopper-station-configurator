@@ -2,55 +2,95 @@
 // SHARE MENU COMPONENT
 // ============================================================================
 //
-// Dropdown menu with sharing/export options:
+// Dropdown menu with sharing/export options (per Панель_кнопок.pdf):
 // - Email: Open mail client with pre-filled template
-// - Save: Download as PDF (placeholder)
+// - Save PDF: Download configuration as PDF
 // - Print: Browser print dialog
 // - Copy URL: Copy shareable URL to clipboard
 // - Copy Model ID: Copy article code to clipboard
+//
 // ============================================================================
 
-import type { ProductModel } from "../types";
+import { useEffect, useRef } from "react";
+import type { ProductModel, ModelId } from "../types";
+
+// ============================================================================
+// TYPES
+// ============================================================================
 
 interface ShareMenuProps {
   /** Generated product model with full code */
   productModel: ProductModel;
-  
+
+  /** Current model ID (for URL generation) */
+  modelId?: ModelId;
+
   /** Callback to close the menu */
   onClose: () => void;
 }
 
+// ============================================================================
+// COMPONENT
+// ============================================================================
+
 /**
  * Dropdown menu with sharing and export options.
+ * Closes on click outside or Escape key.
  */
-export function ShareMenu({ productModel, onClose }: ShareMenuProps) {
+export function ShareMenu({ productModel, modelId, onClose }: ShareMenuProps) {
+  const menuRef = useRef<HTMLDivElement>(null);
+
+  // Close on Escape key
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        onClose();
+      }
+    };
+
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, [onClose]);
+
+  // Focus trap - focus first item on open
+  useEffect(() => {
+    const firstButton = menuRef.current?.querySelector("button");
+    firstButton?.focus();
+  }, []);
+
   /**
-   * Copy model ID to clipboard
+   * Copy text to clipboard with fallback
    */
-  const handleCopyModelId = async () => {
+  const copyToClipboard = async (text: string, successMessage: string) => {
     try {
-      await navigator.clipboard.writeText(productModel.fullCode);
-      alert("Model ID copied to clipboard!");
+      await navigator.clipboard.writeText(text);
+      // TODO: Replace with toast notification
+      alert(successMessage);
     } catch {
       // Fallback for older browsers
-      prompt("Copy this Model ID:", productModel.fullCode);
+      prompt("Copy this:", text);
     }
     onClose();
   };
 
   /**
+   * Copy model ID to clipboard
+   */
+  const handleCopyModelId = () => {
+    copyToClipboard(productModel.fullCode, "Model ID copied to clipboard!");
+  };
+
+  /**
    * Copy shareable URL to clipboard
    */
-  const handleCopyURL = async () => {
-    const url = `${window.location.origin}${window.location.pathname}?model=${encodeURIComponent(productModel.fullCode)}`;
-    try {
-      await navigator.clipboard.writeText(url);
-      alert("URL copied to clipboard!");
-    } catch {
-      // Fallback for older browsers
-      prompt("Copy this URL:", url);
-    }
-    onClose();
+  const handleCopyURL = () => {
+    const baseUrl = `${window.location.origin}/configurator`;
+    const params = new URLSearchParams({
+      ...(modelId && { model: modelId }),
+      code: productModel.fullCode,
+    });
+    const url = `${baseUrl}?${params.toString()}`;
+    copyToClipboard(url, "URL copied to clipboard!");
   };
 
   /**
@@ -58,12 +98,15 @@ export function ShareMenu({ productModel, onClose }: ShareMenuProps) {
    */
   const handleEmail = () => {
     const subject = encodeURIComponent(
-      `Stopper Station Configuration: ${productModel.fullCode}`
+      `Product Configuration: ${productModel.fullCode}`
     );
+    const shareUrl = `${window.location.origin}/configurator?code=${productModel.fullCode}`;
     const body = encodeURIComponent(
-      `I've configured a Stopper Station:\n\n` +
-      `Model: ${productModel.fullCode}\n\n` +
-      `View configuration: ${window.location.origin}${window.location.pathname}?model=${productModel.fullCode}`
+      `I've configured a product:\n\n` +
+        `Model: ${productModel.fullCode}\n\n` +
+        `View configuration: ${shareUrl}\n\n` +
+        `---\n` +
+        `Sent from Build It Configurator`
     );
     window.location.href = `mailto:?subject=${subject}&body=${body}`;
     onClose();
@@ -78,21 +121,23 @@ export function ShareMenu({ productModel, onClose }: ShareMenuProps) {
   };
 
   /**
-   * Save as PDF (placeholder)
-   * TODO: Implement PDF generation with jsPDF or similar
+   * Save as PDF
+   * TODO: Implement PDF generation with jsPDF or html2pdf
+   * ASSUMPTION: For MVP, use Print → Save as PDF
    */
-  const handleSave = () => {
-    alert("Save PDF: Not implemented yet.\n\nUse Print → Save as PDF as a workaround.");
+  const handleSavePDF = () => {
+    // Trigger print dialog - user can "Save as PDF"
+    window.print();
     onClose();
   };
 
   // Menu items configuration
   const menuItems = [
-    { icon: "✉️", label: "Email", onClick: handleEmail },
-    { icon: "💾", label: "Save", onClick: handleSave },
-    { icon: "🖨️", label: "Print", onClick: handlePrint },
-    { icon: "🔗", label: "Copy URL", onClick: handleCopyURL },
-    { icon: "📋", label: "Copy Model ID", onClick: handleCopyModelId },
+    { icon: <EmailIcon />, label: "Email", onClick: handleEmail },
+    { icon: <SaveIcon />, label: "Save PDF", onClick: handleSavePDF },
+    { icon: <PrintIcon />, label: "Print", onClick: handlePrint },
+    { icon: <LinkIcon />, label: "Copy URL", onClick: handleCopyURL },
+    { icon: <CopyIcon />, label: "Copy Model ID", onClick: handleCopyModelId },
   ];
 
   return (
@@ -106,24 +151,97 @@ export function ShareMenu({ productModel, onClose }: ShareMenuProps) {
 
       {/* Dropdown menu */}
       <div
-        className="absolute top-full right-0 mt-2 bg-white border border-gray-300 
-                   rounded-lg shadow-lg py-2 w-48 z-20"
+        ref={menuRef}
+        className="absolute top-full right-0 mt-2 bg-white border border-gray-200 
+                   rounded-lg shadow-lg py-1 w-44 z-20"
         role="menu"
+        aria-label="Share options"
       >
-        {menuItems.map((item) => (
+        {menuItems.map((item, index) => (
           <button
             key={item.label}
             type="button"
-            className="w-full text-left px-4 py-2 hover:bg-gray-100 
-                       text-sm text-gray-700 flex items-center gap-2"
+            className="w-full text-left px-3 py-2 hover:bg-gray-100 
+                       text-sm text-gray-700 flex items-center gap-3
+                       focus:bg-gray-100 focus:outline-none"
             onClick={item.onClick}
             role="menuitem"
+            tabIndex={index === 0 ? 0 : -1}
           >
-            <span>{item.icon}</span>
+            <span className="w-4 h-4 text-gray-500">{item.icon}</span>
             <span>{item.label}</span>
           </button>
         ))}
       </div>
     </>
+  );
+}
+
+// ============================================================================
+// ICONS (inline SVG components)
+// ============================================================================
+
+function EmailIcon() {
+  return (
+    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth={2}
+        d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+      />
+    </svg>
+  );
+}
+
+function SaveIcon() {
+  return (
+    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth={2}
+        d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+      />
+    </svg>
+  );
+}
+
+function PrintIcon() {
+  return (
+    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth={2}
+        d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"
+      />
+    </svg>
+  );
+}
+
+function LinkIcon() {
+  return (
+    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth={2}
+        d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"
+      />
+    </svg>
+  );
+}
+
+function CopyIcon() {
+  return (
+    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth={2}
+        d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"
+      />
+    </svg>
   );
 }
