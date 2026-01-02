@@ -1,19 +1,23 @@
 import { useState, useEffect } from "react";
-import type { Configuration, ProductModel, ModelDefinition, StepId } from "../types";
+import type { Configuration, ProductModel, ModelDefinition, StepId, CustomTextData } from "../types";
 import { ProductPreview } from "./ProductPreview";
 import { ProductModelDisplay } from "./ProductModelDisplay";
 import { ActionButtons } from "./ActionButtons";
+import { CustomTextForm } from "./CustomTextForm";
 import { getCompletedDeviceImage } from "../utils/getCompletedDeviceImage";
+import { shouldShowCustomTextForm } from "../utils/customTextHelpers";
 
 type TabId = "edit" | "preview";
 
 interface MainPanelProps {
   model: ModelDefinition;
   config: Configuration;
+  customText: CustomTextData | null;
   productModel: ProductModel;
   onEditStep: (stepId: StepId) => void;
   onReset: () => void;
   onAddToMyList: () => void;
+  onCustomTextSubmit: (data: Omit<CustomTextData, "submitted">) => void;
   isInMyList?: boolean;
   className?: string;
 }
@@ -21,23 +25,41 @@ interface MainPanelProps {
 export function MainPanel({
   model,
   config,
+  customText,
   productModel,
   onEditStep,
   onReset,
   onAddToMyList,
+  onCustomTextSubmit,
   isInMyList = false,
   className = "",
 }: MainPanelProps) {
   const [activeTab, setActiveTab] = useState<TabId>("edit");
 
-  // Auto-switch tabs based on configuration completion
+  const showCustomTextForm = shouldShowCustomTextForm(model, config, customText);
+
   useEffect(() => {
+    if (customText?.submitted) {
+      setActiveTab("preview");
+      return;
+    }
+
+    if (showCustomTextForm) {
+      setActiveTab("edit");
+      return;
+    }
+
     if (productModel.isComplete) {
       setActiveTab("preview");
     } else {
       setActiveTab("edit");
     }
-  }, [productModel.isComplete]);
+  }, [productModel.isComplete, showCustomTextForm, customText?.submitted]);
+
+  const handleCustomTextSubmit = (data: Omit<CustomTextData, "submitted">) => {
+    onCustomTextSubmit(data);
+    setActiveTab("preview");
+  };
 
   const { imagePath, reason } = getCompletedDeviceImage({
     fullCode: productModel.fullCode,
@@ -79,11 +101,18 @@ export function MainPanel({
 
           {activeTab === "edit" && (
             <div className="mt-10">
-              <ProductPreview
-                model={model}
-                config={config}
-                onEditStep={onEditStep}
-              />
+              {showCustomTextForm ? (
+                <CustomTextForm
+                  onSubmit={handleCustomTextSubmit}
+                  initialData={customText ?? undefined}
+                />
+              ) : (
+                <ProductPreview
+                  model={model}
+                  config={config}
+                  onEditStep={onEditStep}
+                />
+              )}
             </div>
           )}
 
@@ -144,32 +173,30 @@ function ProductPreviewContent({
 }: ProductPreviewContentProps) {
   const [hasError, setHasError] = useState(false);
 
-  if (hasError) {
-    return (
-      <div className="flex w-full flex-col items-center gap-11 py-16 text-center text-gray-500">
-        <p className="font-medium text-base lg:text-md">
-          PREVIEW<br />NOT AVAILABLE
-        </p>
-        <p className="font-normal text-base lg:text-md">
-          Image failed to load
-        </p>
-      </div>
-    );
-  }
-
   return (
     <div className="flex w-full flex-col gap-10 py-5">
-      <div className="mx-auto max-w-120 flex-1">
-        <img
-          alt={`Image of ${productCode}`}
-          loading="lazy"
-          width="600"
-          height="600"
-          className="select-none object-contain w-full h-auto"
-          src={imagePath}
-          onError={() => setHasError(true)}
-        />
-      </div>
+      {hasError ? (
+        <div className="flex w-full flex-col items-center gap-11 py-16 text-center text-gray-500">
+          <p className="font-medium text-base lg:text-md">
+            PREVIEW<br />NOT AVAILABLE
+          </p>
+          <p className="font-normal text-base lg:text-md">
+            Image failed to load
+          </p>
+        </div>
+      ) : (
+        <div className="mx-auto max-w-120 flex-1">
+          <img
+            alt={`Image of ${productCode}`}
+            loading="lazy"
+            width="600"
+            height="600"
+            className="select-none object-contain w-full h-auto"
+            src={imagePath}
+            onError={() => setHasError(true)}
+          />
+        </div>
+      )}
 
       {isComplete && (
         <div className="flex w-full flex-wrap items-center justify-center gap-2 md:items-start md:gap-6">

@@ -6,27 +6,17 @@ export type ModelId =
   | "reset-call-points"
   | "waterproof-reset-call-point";
 
+export type StepId = string;
+export type OptionId = string;
+
 export const MODEL_NAMES: Record<ModelId, string> = {
   "stopper-stations": "Stopper® Stations",
-  "indoor-push-buttons": "StopperSwitches Indoor Push Buttons",
-  "key-switches": "StopperSwitches Key Switches",
-  "waterproof-push-buttons": "StopperSwitches Waterproof Push Buttons",
+  "indoor-push-buttons": "Indoor Push Buttons",
+  "key-switches": "Key Switches",
+  "waterproof-push-buttons": "Waterproof Push Buttons",
   "reset-call-points": "ReSet Call Points",
   "waterproof-reset-call-point": "Waterproof ReSet Call Point",
 };
-
-export const MODEL_SLUGS: Record<ModelId, string> = {
-  "stopper-stations": "stopper-stations",
-  "indoor-push-buttons": "indoor-push-buttons",
-  "key-switches": "key-switches",
-  "waterproof-push-buttons": "waterproof-push-buttons",
-  "reset-call-points": "reset-call-points",
-  "waterproof-reset-call-point": "waterproof-reset-call-point",
-};
-
-export type OptionId = string;
-
-export type StepId = string;
 
 export interface Option {
   id: OptionId;
@@ -34,7 +24,7 @@ export interface Option {
   code: string;
   image?: string;
   notes?: string;
-  availableFor?: string[];
+  availableFor?: OptionId[];
   dependsOn?: StepId;
 }
 
@@ -48,7 +38,7 @@ export interface Step {
 export interface ProductModelSchema {
   baseCode: string;
   partsOrder: StepId[];
-  separator: "none" | "dash" | string;
+  separator: "none" | "dash";
   separatorMap?: Record<StepId, string>;
 }
 
@@ -62,7 +52,31 @@ export interface ModelDefinition {
   primaryDependencyStep?: StepId;
 }
 
+export interface CustomTextData {
+  lineCount: 1 | 2;
+  line1: string;
+  line2: string;
+  submitted: boolean;
+}
+
 export type Configuration = Record<StepId, OptionId | null>;
+
+export interface ProductModel {
+  baseCode: string;
+  parts: Record<StepId, string>;
+  fullCode: string;
+  isComplete: boolean;
+}
+
+export interface SavedConfiguration {
+  id: string;
+  modelId: ModelId;
+  productCode: string;
+  configuration: Configuration;
+  customText?: CustomTextData;
+  savedAt: number;
+  name?: string;
+}
 
 export function createEmptyConfiguration(model: ModelDefinition): Configuration {
   const config: Configuration = {};
@@ -72,54 +86,21 @@ export function createEmptyConfiguration(model: ModelDefinition): Configuration 
   return config;
 }
 
-export interface ProductModel {
-  baseCode: string;
-  parts: Record<StepId, string>;
-  fullCode: string;
-  isComplete: boolean;
-  missingSteps?: StepId[];
-}
-
-export interface SavedConfiguration {
-  id: string;
-  modelId: ModelId;
-  productCode: string;
-  configuration: Configuration;
-  savedAt: number;
-  name?: string;
-}
 export function generateSavedConfigurationId(): string {
-  return `config-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
+  return `saved-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
 }
 
-export interface AvailabilityResult {
-  available: boolean;
-  reason?: string;
-  blockedBy?: StepId;
+export const CUSTOM_TEXT_MAX_LENGTH = {
+  ONE_LINE: 13,
+  TWO_LINES: 20,
+} as const;
+
+export function createEmptyCustomText(): CustomTextData {
+  return {
+    lineCount: 2,
+    line1: "",
+    line2: "",
+    submitted: false,
+  };
 }
 
-export type LegacyStepId =
-  | "colour"
-  | "cover"
-  | "activation"
-  | "text"
-  | "language"
-  | "installationOptions";
-
-export interface LegacyConfiguration {
-  colour: OptionId | null;
-  cover: OptionId | null;
-  activation: OptionId | null;
-  text: OptionId | null;
-  language: OptionId | null;
-  installationOptions: OptionId | null;
-}
-
-export const STEP_ORDER: LegacyStepId[] = [
-  "colour",
-  "cover",
-  "activation",
-  "text",
-  "language",
-  "installationOptions",
-];

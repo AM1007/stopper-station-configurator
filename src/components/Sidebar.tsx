@@ -1,9 +1,12 @@
-import type { Configuration, StepId, OptionId, ModelDefinition } from "../types";
+import type { Configuration, StepId, OptionId, ModelDefinition, CustomTextData } from "../types";
 import { StepSelector } from "./StepSelector";
+import { CustomTextDisplay } from "./CustomTextDisplay";
+import { hasSubmittedCustomText } from "../utils/customTextHelpers";
 
 interface SidebarProps {
   model: ModelDefinition;
   config: Configuration;
+  customText: CustomTextData | null;
   currentStep: StepId | null;
   onSelectOption: (stepId: StepId, optionId: OptionId) => void;
   onClearOption: (stepId: StepId) => void;
@@ -14,6 +17,7 @@ interface SidebarProps {
 export function Sidebar({
   model,
   config,
+  customText,
   currentStep,
   onSelectOption,
   onClearOption,
@@ -23,6 +27,8 @@ export function Sidebar({
   const orderedSteps = model.stepOrder
     .map((stepId) => model.steps.find((s) => s.id === stepId))
     .filter((step): step is NonNullable<typeof step> => step !== undefined);
+
+  const showCustomTextDisplay = hasSubmittedCustomText(config, customText);
 
   return (
     <aside className={`bg-red-600 text-white flex flex-col h-full ${className}`}>
@@ -52,6 +58,10 @@ export function Sidebar({
               onToggle={() => onSetCurrentStep(step.id)}
             />
           ))}
+
+          {showCustomTextDisplay && customText && (
+            <CustomTextDisplay customText={customText} />
+          )}
         </div>
       </div>
     </aside>

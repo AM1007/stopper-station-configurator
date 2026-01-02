@@ -7,6 +7,7 @@ import type {
   OptionId,
   ModelDefinition,
   SavedConfiguration,
+  CustomTextData,
 } from "../types";
 import { createEmptyConfiguration, generateSavedConfigurationId } from "../types";
 import { getModelById } from "../data/models";
@@ -16,82 +17,15 @@ import {
   getMissingRequiredSteps,
 } from "../filterOptions";
 import { buildProductModel } from "../buildProductModel";
-
-// ============================================================================
-// PER-MODEL LOCALSTORAGE PERSISTENCE
-// ============================================================================
-
-interface StoredModelConfiguration {
-  modelId: ModelId;
-  productCode: string;
-  configuration: Configuration;
-  savedAt: number;
-}
-
-function getLocalStorageKey(modelId: ModelId): string {
-  return `config-${modelId}`;
-}
-
-function saveModelToLocalStorage(
-  modelId: ModelId,
-  productCode: string,
-  configuration: Configuration
-): void {
-  const data: StoredModelConfiguration = {
-    modelId,
-    productCode,
-    configuration,
-    savedAt: Date.now(),
-  };
-  
-  try {
-    localStorage.setItem(getLocalStorageKey(modelId), JSON.stringify(data));
-  } catch (error) {
-    console.error(`Failed to save configuration for ${modelId}:`, error);
-  }
-}
-
-function loadModelFromLocalStorage(modelId: ModelId): StoredModelConfiguration | null {
-  try {
-    const raw = localStorage.getItem(getLocalStorageKey(modelId));
-    if (!raw) return null;
-    
-    const data = JSON.parse(raw) as StoredModelConfiguration;
-    
-    // Validate structure
-    if (data.modelId !== modelId || !data.configuration) {
-      return null;
-    }
-    
-    return data;
-  } catch (error) {
-    console.error(`Failed to load configuration for ${modelId}:`, error);
-    return null;
-  }
-}
-
-function clearModelFromLocalStorage(modelId: ModelId): void {
-  try {
-    localStorage.removeItem(getLocalStorageKey(modelId));
-  } catch (error) {
-    console.error(`Failed to clear configuration for ${modelId}:`, error);
-  }
-}
+import { shouldClearCustomText } from "../utils/customTextHelpers";
 
 // ============================================================================
 // URL HELPERS
 // ============================================================================
 
 export function buildProductModelUrl(modelId: ModelId, productCode: string): string {
-  // Encode product code: replace special characters, ensure + is encoded as %2B
-  const encodedProductModel = encodeURIComponent(productCode)
-    .replace(/%2D/g, "-"); // Keep dashes readable
-  
+  const encodedProductModel = encodeURIComponent(productCode).replace(/%2D/g, "-");
   return `?model=${modelId}&productModel=${encodedProductModel}#build-it`;
-}
-
-export function getStoredConfiguration(modelId: ModelId): StoredModelConfiguration | null {
-  return loadModelFromLocalStorage(modelId);
 }
 
 // ============================================================================
@@ -101,6 +35,7 @@ export function getStoredConfiguration(modelId: ModelId): StoredModelConfigurati
 interface ConfigurationState {
   currentModelId: ModelId | null;
   config: Configuration;
+  customText: CustomTextData | null;
   currentStep: StepId | null;
   myList: SavedConfiguration[];
   setModel: (modelId: ModelId) => void;
@@ -109,6 +44,8 @@ interface ConfigurationState {
   clearSelection: (stepId: StepId) => void;
   resetConfiguration: () => void;
   setCurrentStep: (stepId: StepId) => void;
+  setCustomText: (data: Omit<CustomTextData, "submitted">) => void;
+  clearCustomText: () => void;
   addToMyList: (name?: string) => void;
   removeFromMyList: (id: string) => void;
   clearMyList: () => void;
@@ -117,7 +54,6 @@ interface ConfigurationState {
   isComplete: () => boolean;
   getMissingSteps: () => StepId[];
   getProductCode: () => string | null;
-  saveCompletedConfiguration: () => void;
 }
 
 export const useConfigurationStore = create<ConfigurationState>()(
@@ -125,9 +61,10 @@ export const useConfigurationStore = create<ConfigurationState>()(
     (set, get) => ({
       currentModelId: null,
       config: {},
+      customText: null,
       currentStep: null,
       myList: [],
-      
+
       setModel: (modelId) => {
         const model = getModelById(modelId);
         if (!model) {
@@ -135,29 +72,10 @@ export const useConfigurationStore = create<ConfigurationState>()(
           return;
         }
 
-        // Try to load saved configuration from LocalStorage
-        const saved = loadModelFromLocalStorage(modelId);
-        
-        if (saved && saved.configuration) {
-          // Validate saved config matches current model structure
-          const isValid = model.stepOrder.every(
-            (stepId) => stepId in saved.configuration
-          );
-          
-          if (isValid) {
-            set({
-              currentModelId: modelId,
-              config: saved.configuration,
-              currentStep: model.stepOrder[model.stepOrder.length - 1],
-            });
-            return;
-          }
-        }
-
-        // No valid saved config — start fresh
         set({
           currentModelId: modelId,
           config: createEmptyConfiguration(model),
+          customText: null,
           currentStep: model.stepOrder[0],
         });
       },
@@ -166,43 +84,49 @@ export const useConfigurationStore = create<ConfigurationState>()(
         set({
           currentModelId: null,
           config: {},
+          customText: null,
           currentStep: null,
         });
       },
 
       selectOption: (stepId, optionId) => {
-        const { currentModelId, config } = get();
+        const { currentModelId, config, customText } = get();
         const model = currentModelId ? getModelById(currentModelId) : null;
-        
+
         if (!model) return;
+
         const newConfig = { ...config, [stepId]: optionId };
         const toReset = getSelectionsToReset(model, stepId, newConfig);
         for (const resetStepId of toReset) {
           newConfig[resetStepId] = null;
         }
+
         const currentIndex = model.stepOrder.indexOf(stepId);
         const nextStep =
           currentIndex < model.stepOrder.length - 1
             ? model.stepOrder[currentIndex + 1]
             : stepId;
 
+        let newCustomText = customText;
+        if (stepId === "text") {
+          const prevTextOption = config.text ?? null;
+          const newTextOption = optionId;
+          if (shouldClearCustomText(prevTextOption, newTextOption)) {
+            newCustomText = null;
+          }
+        }
+
         set({
           config: newConfig,
+          customText: newCustomText,
           currentStep: nextStep,
         });
-
-        // Auto-save if configuration is now complete
-        const isNowComplete = isConfigurationComplete(model, newConfig);
-        if (isNowComplete && currentModelId) {
-          const productModel = buildProductModel(newConfig, model);
-          saveModelToLocalStorage(currentModelId, productModel.fullCode, newConfig);
-        }
       },
 
       clearSelection: (stepId) => {
-        const { currentModelId, config } = get();
+        const { currentModelId, config, customText } = get();
         const model = currentModelId ? getModelById(currentModelId) : null;
-        
+
         if (!model) return;
 
         const newConfig = { ...config, [stepId]: null };
@@ -211,22 +135,26 @@ export const useConfigurationStore = create<ConfigurationState>()(
           newConfig[resetStepId] = null;
         }
 
-        set({ config: newConfig });
+        let newCustomText = customText;
+        if (stepId === "text") {
+          newCustomText = null;
+        }
+
+        set({
+          config: newConfig,
+          customText: newCustomText,
+        });
       },
 
       resetConfiguration: () => {
         const { currentModelId } = get();
         const model = currentModelId ? getModelById(currentModelId) : null;
-        
-        if (!model) return;
 
-        // Clear LocalStorage for this model
-        if (currentModelId) {
-          clearModelFromLocalStorage(currentModelId);
-        }
+        if (!model) return;
 
         set({
           config: createEmptyConfiguration(model),
+          customText: null,
           currentStep: model.stepOrder[0],
         });
       },
@@ -235,16 +163,29 @@ export const useConfigurationStore = create<ConfigurationState>()(
         set({ currentStep: stepId });
       },
 
+      setCustomText: (data) => {
+        const customTextData: CustomTextData = {
+          ...data,
+          submitted: true,
+        };
+
+        set({ customText: customTextData });
+      },
+
+      clearCustomText: () => {
+        set({ customText: null });
+      },
+
       addToMyList: (name) => {
-        const { currentModelId, config, myList } = get();
-        
+        const { currentModelId, config, customText, myList } = get();
+
         if (!currentModelId) {
           console.warn("Cannot add to My List: no model selected");
           return;
         }
 
         const model = getModelById(currentModelId);
-        
+
         if (!model || !isConfigurationComplete(model, config)) {
           console.warn("Cannot add incomplete configuration to My List");
           return;
@@ -257,6 +198,7 @@ export const useConfigurationStore = create<ConfigurationState>()(
           modelId: currentModelId,
           productCode: productModel.fullCode,
           configuration: { ...config },
+          customText: customText ?? undefined,
           savedAt: Date.now(),
           name,
         };
@@ -276,7 +218,7 @@ export const useConfigurationStore = create<ConfigurationState>()(
       loadFromMyList: (id) => {
         const { myList } = get();
         const saved = myList.find((item) => item.id === id);
-        
+
         if (!saved) {
           console.warn(`Saved configuration not found: ${id}`);
           return;
@@ -291,6 +233,7 @@ export const useConfigurationStore = create<ConfigurationState>()(
         set({
           currentModelId: saved.modelId,
           config: { ...saved.configuration },
+          customText: saved.customText ?? null,
           currentStep: model.stepOrder[model.stepOrder.length - 1],
         });
       },
@@ -315,27 +258,12 @@ export const useConfigurationStore = create<ConfigurationState>()(
       getProductCode: () => {
         const { currentModelId, config } = get();
         const model = currentModelId ? getModelById(currentModelId) : null;
-        
+
         if (!model || !isConfigurationComplete(model, config)) {
           return null;
         }
 
         return buildProductModel(config, model).fullCode;
-      },
-
-      saveCompletedConfiguration: () => {
-        const { currentModelId, config } = get();
-        const model = currentModelId ? getModelById(currentModelId) : null;
-        
-        if (!model || !currentModelId) return;
-        
-        if (!isConfigurationComplete(model, config)) {
-          console.warn("Cannot save incomplete configuration");
-          return;
-        }
-
-        const productModel = buildProductModel(config, model);
-        saveModelToLocalStorage(currentModelId, productModel.fullCode, config);
       },
     }),
     {
@@ -350,6 +278,9 @@ export const useCurrentModelId = () =>
 
 export const useConfig = () =>
   useConfigurationStore((state) => state.config);
+
+export const useCustomText = () =>
+  useConfigurationStore((state) => state.customText);
 
 export const useCurrentStep = () =>
   useConfigurationStore((state) => state.currentStep);
