@@ -19,18 +19,10 @@ import {
 import { buildProductModel } from "../buildProductModel";
 import { shouldClearCustomText } from "../utils/customTextHelpers";
 
-// ============================================================================
-// URL HELPERS
-// ============================================================================
-
 export function buildProductModelUrl(modelId: ModelId, productCode: string): string {
   const encodedProductModel = encodeURIComponent(productCode).replace(/%2D/g, "-");
   return `?model=${modelId}&productModel=${encodedProductModel}#build-it`;
 }
-
-// ============================================================================
-// ZUSTAND STORE
-// ============================================================================
 
 interface ConfigurationState {
   currentModelId: ModelId | null;
@@ -66,6 +58,13 @@ export const useConfigurationStore = create<ConfigurationState>()(
       myList: [],
 
       setModel: (modelId) => {
+        const { currentModelId } = get();
+        
+        // Идемпотентность: если модель уже установлена — не сбрасывать конфигурацию
+        if (currentModelId === modelId) {
+          return;
+        }
+
         const model = getModelById(modelId);
         if (!model) {
           console.error(`Model not found: ${modelId}`);
@@ -295,4 +294,11 @@ export const useIsProductInMyList = (productCode: string | null) =>
   useConfigurationStore((state) => {
     if (!productCode) return false;
     return state.myList.some((item) => item.productCode === productCode);
+  });
+
+export const useMyListItemIdByProductCode = (productCode: string | null) =>
+  useConfigurationStore((state) => {
+    if (!productCode) return null;
+    const item = state.myList.find((item) => item.productCode === productCode);
+    return item?.id ?? null;
   });

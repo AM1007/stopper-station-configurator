@@ -1,5 +1,6 @@
 import { useEffect, useRef } from "react";
 import type { ProductModel, ModelId } from "../types";
+import { toast } from "../utils/toast";
 
 interface ShareMenuProps {
   productModel: ProductModel;
@@ -29,9 +30,9 @@ export function ShareMenu({ productModel, modelId, onClose }: ShareMenuProps) {
   const copyToClipboard = async (text: string, successMessage: string) => {
     try {
       await navigator.clipboard.writeText(text);
-      alert(successMessage);
+      toast.success(successMessage);
     } catch {
-      prompt("Copy this:", text);
+      toast.copyFallback(text);
     }
     onClose();
   };

@@ -17,6 +17,7 @@ interface MainPanelProps {
   onEditStep: (stepId: StepId) => void;
   onReset: () => void;
   onAddToMyList: () => void;
+  onRemoveFromMyList: () => void;
   onCustomTextSubmit: (data: Omit<CustomTextData, "submitted">) => void;
   isInMyList?: boolean;
   className?: string;
@@ -30,6 +31,7 @@ export function MainPanel({
   onEditStep,
   onReset,
   onAddToMyList,
+  onRemoveFromMyList,
   onCustomTextSubmit,
   isInMyList = false,
   className = "",
@@ -126,6 +128,7 @@ export function MainPanel({
                   productModel={productModel}
                   onReset={onReset}
                   onAddToMyList={onAddToMyList}
+                  onRemoveFromMyList={onRemoveFromMyList}
                   isInMyList={isInMyList}
                 />
               ) : (
@@ -159,6 +162,7 @@ interface ProductPreviewContentProps {
   productModel: ProductModel;
   onReset: () => void;
   onAddToMyList: () => void;
+  onRemoveFromMyList: () => void;
   isInMyList: boolean;
 }
 
@@ -169,6 +173,7 @@ function ProductPreviewContent({
   productModel,
   onReset,
   onAddToMyList,
+  onRemoveFromMyList,
   isInMyList,
 }: ProductPreviewContentProps) {
   const [hasError, setHasError] = useState(false);
@@ -204,6 +209,7 @@ function ProductPreviewContent({
             productModel={productModel}
             onReset={onReset}
             onAddToMyList={onAddToMyList}
+            onRemoveFromMyList={onRemoveFromMyList}
             isInMyList={isInMyList}
           />
         </div>

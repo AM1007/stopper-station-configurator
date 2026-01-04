@@ -6,6 +6,7 @@ interface ActionButtonsProps {
   productModel: ProductModel;
   onReset: () => void;
   onAddToMyList: () => void;
+  onRemoveFromMyList: () => void;
   isInMyList?: boolean;
 }
 
@@ -13,6 +14,7 @@ export function ActionButtons({
   productModel,
   onReset,
   onAddToMyList,
+  onRemoveFromMyList,
   isInMyList = false,
 }: ActionButtonsProps) {
   const [showShareMenu, setShowShareMenu] = useState(false);
@@ -21,11 +23,15 @@ export function ActionButtons({
     window.open("https://example.com/where-to-buy", "_blank");
   };
 
-  const handleAddToMyList = () => {
-    if (!isInMyList) {
+  const handleStarClick = () => {
+    if (isInMyList) {
+      onRemoveFromMyList();
+    } else {
       onAddToMyList();
     }
   };
+
+  const starTitle = isInMyList ? "Remove from My List" : "Add to My List";
 
   return (
     <div className="flex w-full flex-wrap items-center justify-center gap-2 md:items-start md:gap-6">
@@ -77,12 +83,11 @@ export function ActionButtons({
 
       <button
         type="button"
-        onClick={handleAddToMyList}
-        className={`inline-flex h-9 w-9 items-center justify-center bg-gray-100 transition-all duration-300 lg:h-11 lg:w-11 ${isInMyList ? "" : "cursor-pointer"}`}
-        aria-label={isInMyList ? "Already in My List" : "Add to My List"}
+        onClick={handleStarClick}
+        className="cursor-pointer inline-flex h-9 w-9 items-center justify-center bg-gray-100 transition-all duration-300 lg:h-11 lg:w-11 hover:bg-gray-200"
+        aria-label={starTitle}
         aria-pressed={isInMyList}
-        disabled={isInMyList}
-        title={isInMyList ? "Already in My List" : "Add to My List"}
+        title={starTitle}
       >
         <div className="flex items-center justify-start gap-3">
           <span className="inline-grid text-lg text-red-600">

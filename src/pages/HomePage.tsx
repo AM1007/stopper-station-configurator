@@ -14,21 +14,19 @@ export function HomePage() {
   const activeModel = getModelBySlug(modelSlug) || getModelBySlug(DEFAULT_MODEL_SLUG)!;
   
   const addToMyList = useConfigurationStore((state) => state.addToMyList);
+  const removeFromMyList = useConfigurationStore((state) => state.removeFromMyList);
   const setModel = useConfigurationStore((state) => state.setModel);
   const config = useConfigurationStore((state) => state.config);
   const currentModelId = useConfigurationStore((state) => state.currentModelId);
 
-  // Sync URL when configuration completes
   useEffect(() => {
     const state = useConfigurationStore.getState();
     const isComplete = state.isComplete();
     const productCode = state.getProductCode();
 
     if (isComplete && productCode && currentModelId === activeModel.id) {
-      // Build URL with productModel parameter
       const urlParams = buildProductModelUrl(activeModel.id, productCode);
       
-      // Parse the URL params to use with setSearchParams
       const url = new URL(urlParams, window.location.origin);
       const newParams: Record<string, string> = {};
       url.searchParams.forEach((value, key) => {
@@ -37,7 +35,6 @@ export function HomePage() {
 
       setSearchParams(newParams, { replace: true });
       
-      // Set hash anchor for scroll position
       if (window.location.hash !== "#build-it") {
         window.history.replaceState(null, "", `${window.location.pathname}${window.location.search}#build-it`);
       }
@@ -56,6 +53,10 @@ export function HomePage() {
   const handleAddToMyList = () => {
     setModel(activeModel.id);
     addToMyList();
+  };
+
+  const handleRemoveFromMyList = (itemId: string) => {
+    removeFromMyList(itemId);
   };
 
   return (
@@ -100,15 +101,14 @@ export function HomePage() {
             </h2>
           </div>
           
-          {/* TODO: Add embedded prop support in BuildItCalculator */}
           <BuildItCalculator
             model={activeModel}
             onAddToMyList={handleAddToMyList}
+            onRemoveFromMyList={handleRemoveFromMyList}
           />
         </div>
       </section>
 
-      {/* Info Section */}
       <section className="bg-gray-50 py-12 md:py-16 border-t border-gray-200">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-2xl font-bold text-gray-800 mb-4">

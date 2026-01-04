@@ -3,17 +3,19 @@ import { useConfiguration } from "../hooks/useConfiguration";
 import { buildProductModel } from "../buildProductModel";
 import { Sidebar } from "./Sidebar";
 import { MainPanel } from "./MainPanel";
-import { useCustomText, useConfigurationStore, useIsProductInMyList } from "../stores/configurationStore";
+import { useCustomText, useConfigurationStore, useIsProductInMyList, useMyListItemIdByProductCode } from "../stores/configurationStore";
 
 interface BuildItCalculatorProps {
   model: ModelDefinition;
   onAddToMyList?: (productCode: string) => void;
+  onRemoveFromMyList?: (itemId: string) => void;
   onBack?: () => void;
 }
 
 export function BuildItCalculator({
   model,
   onAddToMyList,
+  onRemoveFromMyList,
 }: BuildItCalculatorProps) {
   const {
     config,
@@ -29,6 +31,7 @@ export function BuildItCalculator({
 
   const productModel = buildProductModel(config, model);
   const isInMyList = useIsProductInMyList(productModel.isComplete ? productModel.fullCode : null);
+  const myListItemId = useMyListItemIdByProductCode(productModel.isComplete ? productModel.fullCode : null);
 
   const handleEditStep = (stepId: string) => {
     setCurrentStep(stepId);
@@ -41,6 +44,12 @@ export function BuildItCalculator({
   const handleAddToMyList = () => {
     if (productModel.isComplete && onAddToMyList) {
       onAddToMyList(productModel.fullCode);
+    }
+  };
+
+  const handleRemoveFromMyList = () => {
+    if (myListItemId && onRemoveFromMyList) {
+      onRemoveFromMyList(myListItemId);
     }
   };
 
@@ -72,6 +81,7 @@ export function BuildItCalculator({
         onEditStep={handleEditStep}
         onReset={handleReset}
         onAddToMyList={handleAddToMyList}
+        onRemoveFromMyList={handleRemoveFromMyList}
         onCustomTextSubmit={handleCustomTextSubmit}
         isInMyList={isInMyList}
       />
