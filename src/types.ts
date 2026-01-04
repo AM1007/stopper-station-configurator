@@ -68,6 +68,7 @@ export interface ProductModel {
   parts: Record<StepId, string>;
   fullCode: string;
   isComplete: boolean;
+  missingSteps?: StepId[];
 }
 
 export interface SavedConfiguration {
@@ -86,6 +87,12 @@ export interface CustomTextConfig {
   variant: CustomTextVariant;
   maxLength: number | { oneLine: number; twoLines: number };
   line2Required: boolean;
+}
+
+export interface AvailabilityResult {
+  available: boolean;
+  reason?: string;
+  blockedBy?: StepId;
 }
 
 export function createEmptyConfiguration(model: ModelDefinition): Configuration {
