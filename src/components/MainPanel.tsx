@@ -85,9 +85,9 @@ export function MainPanel({
   };
 
   return (
-    <div className={`hidden h-full w-full lg:block ${className}`}>
-      <div className="sticky top-0 flex h-fit flex-col gap-16 p-5 lg:p-10 xl:gap-20 xl:p-16">
-        <div className="min-h-144 w-full">
+    <div className={`h-full w-full ${className}`}>
+      <div className="flex h-fit flex-col gap-8 p-5 lg:sticky lg:top-0 lg:gap-16 lg:p-10 xl:gap-20 xl:p-16">
+        <div className="w-full lg:min-h-144">
           <div className="inline-flex items-center justify-center h-auto gap-6 rounded-none bg-white p-0 text-black xl:gap-10">
             <button
               type="button"

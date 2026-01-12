@@ -1,14 +1,9 @@
-import { BrowserRouter, Routes, Route, Navigate, useParams } from "react-router-dom";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { HomePage } from "./pages/HomePage";
+import { ConfiguratorPage } from "./pages/ConfiguratorPage";
 import { MyListPage } from "./pages/MyListPage";
+import { NotFoundPage } from "./pages/NotFoundPage";
 import { Layout } from "./components/Layout";
-
-function ConfiguratorRedirect() {
-  const { modelSlug } = useParams<{ modelSlug: string }>();
-  
-  // TODO: Add scroll-to-configurator after redirect if needed
-  return <Navigate to={`/?model=${modelSlug}`} replace />;
-}
 
 function App() {
   return (
@@ -24,8 +19,12 @@ function App() {
         />
 
         <Route
-          path="/configurator/:modelSlug"
-          element={<ConfiguratorRedirect />}
+          path="/configurator/:slug"
+          element={
+            <Layout>
+              <ConfiguratorPage />
+            </Layout>
+          }
         />
 
         <Route
@@ -37,13 +36,13 @@ function App() {
           }
         />
 
-        <Route 
-          path="*" 
+        <Route
+          path="*"
           element={
             <Layout>
-              <HomePage />
+              <NotFoundPage />
             </Layout>
-          } 
+          }
         />
       </Routes>
     </BrowserRouter>

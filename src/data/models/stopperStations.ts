@@ -1,6 +1,6 @@
 import type { ModelDefinition, Step } from "../../types";
 
-const IMG = "/Stopper® Stations";
+const IMG = "/Stopper Stations";
 
 const steps: Step[] = [
   {
@@ -329,5 +329,4 @@ export function getOptionById(stepId: string, optionId: string) {
   const step = getStepById(stepId);
   return step?.options.find((opt) => opt.id === optionId);
 }
-
 
