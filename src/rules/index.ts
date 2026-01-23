@@ -28,4 +28,5 @@ export { LOW_PROFILE_UNIVERSAL_STOPPER_CONSTRAINTS } from "./lowProfileUniversal
 export { GLOBAL_RESET_CONSTRAINTS } from "./globalResetRules";
 export { ENVIRO_STOPPER_CONSTRAINTS } from "./enviroStopperRules";
 export { ALERT_POINT_CONSTRAINTS } from "./alertPointRules";
-
+export { CALL_POINT_STOPPER_CONSTRAINTS } from "./callPointStopperRules";
+export { ENVIRO_ARMOUR_CONSTRAINTS } from "./enviroArmourRules";

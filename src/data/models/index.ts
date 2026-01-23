@@ -13,6 +13,9 @@ import { lowProfileUniversalStopperModel } from "./lowProfileUniversalStopper";
 import { globalResetModel } from "./globalReset";
 import { enviroStopperModel } from "./enviroStopper";
 import { alertPointModel } from "./alertPoint";
+import { callPointStopperModel } from "./callPointStopper";
+import { enviroArmourModel } from "./enviroArmour";
+import { euroStopperModel } from "./euroStopper";
 
 export const MODEL_REGISTRY: Record<ModelId, ModelDefinition> = {
   "stopper-stations": stopperStationsModel,
@@ -28,6 +31,9 @@ export const MODEL_REGISTRY: Record<ModelId, ModelDefinition> = {
   "global-reset": globalResetModel,
   "enviro-stopper": enviroStopperModel,
   "alert-point": alertPointModel,
+  "call-point-stopper": callPointStopperModel,
+  "enviro-armour": enviroArmourModel,
+  "euro-stopper": euroStopperModel,
 };
 
 export const PRODUCTION_MODEL_IDS: ModelId[] = [
@@ -44,6 +50,9 @@ export const PRODUCTION_MODEL_IDS: ModelId[] = [
   "global-reset",
   "enviro-stopper",
   "alert-point",
+  "call-point-stopper",
+  "enviro-armour",
+  "euro-stopper",
 ];
 
 export function isProductionReady(modelId: ModelId): boolean {
@@ -99,3 +108,7 @@ export { lowProfileUniversalStopperModel } from "./lowProfileUniversalStopper";
 export { globalResetModel } from "./globalReset";
 export { enviroStopperModel } from "./enviroStopper";
 export { alertPointModel } from "./alertPoint";
+export { callPointStopperModel } from "./callPointStopper";
+export { enviroArmourModel } from "./enviroArmour";
+export { euroStopperModel } from "./euroStopper";
+

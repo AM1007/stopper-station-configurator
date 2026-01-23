@@ -109,6 +109,45 @@ export function identifyModel(modelCode: string): string | null {
   if (modelCode.startsWith("GLR")) {
     return "global-reset";
   }
+  if (modelCode.startsWith("AP")) {
+    return "alert-point";
+  }
+  if (modelCode.startsWith("ET-") || modelCode.startsWith("ES-")) {
+    return "enviro-armour";
+  }
+  if (modelCode.startsWith("STI-693")) {
+    return "call-point-stopper";
+  }
+  if (modelCode.startsWith("STI-")) {
+    return "universal-stopper";
+  }
+  if (modelCode.startsWith("G3")) {
+    return "g3-multipurpose-push-button";
+  }
+  if (modelCode.startsWith("GF")) {
+    return "gf-fire-alarm-push-button";
+  }
+  if (modelCode.startsWith("GLR")) {
+    return "global-reset";
+  }
+  if (modelCode.startsWith("AP")) {
+    return "alert-point";
+  }
+  if (modelCode.startsWith("STI-693")) {
+    return "call-point-stopper";
+  }
+  if (modelCode.startsWith("STI-")) {
+    return "universal-stopper";
+  }
+  if (modelCode.startsWith("G3")) {
+    return "g3-multipurpose-push-button";
+  }
+  if (modelCode.startsWith("GF")) {
+    return "gf-fire-alarm-push-button";
+  }
+  if (modelCode.startsWith("GLR")) {
+    return "global-reset";
+  }
   if (modelCode.startsWith("STI-")) {
     return "universal-stopper";
   }

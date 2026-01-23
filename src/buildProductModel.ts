@@ -112,6 +112,9 @@ export function identifyModel(modelCode: string): string | null {
   if (modelCode.startsWith("AP")) {
     return "alert-point";
   }
+  if (modelCode.startsWith("STI-15")) {
+    return "euro-stopper";
+  }
   if (modelCode.startsWith("STI-")) {
     return "universal-stopper";
   }

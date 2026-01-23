@@ -6,5 +6,5 @@ export const enviroArmourMeta: ConfiguratorMeta = {
   name: "EnviroArmour®",
   description: "IP 54 Protection for Equipment Against Damage and Ingress",
   imagePath: "/Configurators/15_EnviroArmour.webp",
-  isImplemented: false,
+  isImplemented: true,
 };

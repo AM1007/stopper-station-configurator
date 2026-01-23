@@ -20,6 +20,8 @@ import {
   GLOBAL_RESET_CONSTRAINTS,
   ENVIRO_STOPPER_CONSTRAINTS,
   ALERT_POINT_CONSTRAINTS,
+  CALL_POINT_STOPPER_CONSTRAINTS,
+  ENVIRO_ARMOUR_CONSTRAINTS,
   type IConstraintEngine,
   type ConstraintResult,
 } from "./rules";
@@ -84,6 +86,16 @@ function getConstraintEngine(modelId: string): IConstraintEngine | null {
     }
     case "alert-point": {
       const engine = createConstraintEngine(ALERT_POINT_CONSTRAINTS);
+      engineCache.set(modelId, engine);
+      return engine;
+    }
+    case "call-point-stopper": {
+      const engine = createConstraintEngine(CALL_POINT_STOPPER_CONSTRAINTS);
+      engineCache.set(modelId, engine);
+      return engine;
+    }
+    case "enviro-armour": {
+      const engine = createConstraintEngine(ENVIRO_ARMOUR_CONSTRAINTS);
       engineCache.set(modelId, engine);
       return engine;
     }

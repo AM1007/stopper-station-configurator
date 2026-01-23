@@ -12,6 +12,11 @@
       📄 G Green.webp
       📄 R Red.webp
       📄 W White.webp
+    📁 HERO
+      📄 01.webp
+      📄 02.webp
+      📄 03.webp
+      📄 04.webp
     📁 LABEL
       📄 A 'A' Label.webp
       📄 B 'B' Label.webp
@@ -35,6 +40,11 @@
       📄 Red.webp
       📄 W White.webp
       📄 Y Yellow.webp
+    📁 HERO
+      📄 01.webp
+      📄 02.webp
+      📄 03.webp
+      📄 04.webp
     📁 LABEL
       📄 CL Custom Label.webp
       📄 in case of emergency break glass.webp
@@ -87,6 +97,12 @@
     📁 COVER
       📄 13 Dome cover.webp
       📄 14 Low profile cover.webp
+    📁 HERO
+      📄 01.webp
+      📄 02.webp
+      📄 03.webp
+      📄 04.webp
+      📄 05.webp
     📁 HOOD_SOUNDER & WIRELESS
       📄 00 No Label Hood.webp
       📄 10 Label Hood without Sounder.webp
@@ -102,6 +118,16 @@
       📄 6 European Enclosed Back Box, 20mm Entry Point & Sealed Mounting Plate.webp
       📄 7 European Enclosed Back Box, 20mm Entry Point & Open Mounting Plate.webp
   📁 EnviroArmour
+    📁 HERO
+      📄 01.webp
+      📄 02.webp
+      📄 03.webp
+      📄 04.webp
+      📄 05.webp
+      📄 06.webp
+      📄 07.webp
+      📄 08.webp
+      📄 09.webp
     📁 MATERIAL
       📄 S Fibreglass (Limited Stock).webp
       📄 T Polycarbonate (Limited Stock).webp
@@ -132,6 +158,16 @@
       📄 NR Red no label.webp
       📄 NW White no label.webp
       📄 NY Yellow no label.webp
+    📁 HERO
+      📄 01.webp
+      📄 02.webp
+      📄 03.webp
+      📄 04.webp
+      📄 05.webp
+      📄 06.webp
+      📄 07.webp
+      📄 08.webp
+      📄 09.webp
     📁 MOUNTING
       📄 0 Flush Mount.webp
       📄 C Surface Mount 32mm Spacer.webp
@@ -152,10 +188,15 @@
       📄 3 white.webp
       📄 4 Blue.webp
       📄 5 Orange.webp
+    📁 COMPLETED DEVICE
+      📁 RED
+        📄 G3A002AB-EN.webp
     📁 COVER
       📄 0 Contact Sales for More Options.png
       📄 0 No Cover.webp
       📄 2 Shield.webp
+    📁 HERO
+      📄 01.webp
     📁 LANGUAGE
       📄 EN English.webp
       📄 ES Spanish.webp
@@ -181,10 +222,15 @@
       📄 XT EXIT.webp
       📄 ZA Custom text.webp
   📁 GF Fire Alarm Push Button
+    📁 COMPLETED DEVICE
     📁 COVER
       📄 0 Contact Sales for More Options.png
       📄 0 No Cover.webp
       📄 2 Shield.webp
+    📁 HERO
+      📄 01.webp
+      📄 02.webp
+      📄 03.webp
     📁 LANGUAGE
       📄 EN English.webp
       📄 ES Spanish.webp
@@ -205,6 +251,10 @@
     📁 COVER
       📄 01 no cover.webp
       📄 21 shield.webp
+    📁 HERO
+      📄 01.webp
+      📄 02.webp
+      📄 03.webp
     📁 LANGUAGE
       📄 EN English.webp
       📄 ES Spanish.webp
@@ -331,6 +381,11 @@
     📁 ELECTRICAL ARRANGEMENTS
       📄 0-Single-Pole-Changeover.webp
       📄 4-Multi-Functional-Signal-(SPC-&-DPC).webp
+    📁 HERO
+      📄 01.webp
+      📄 02.webp
+      📄 03.webp
+      📄 04.webp
     📁 LABEL
       📄 CL-Custom-Label.webp
       📄 Self-Assemble-Label-Kit.webp
@@ -442,6 +497,12 @@
       📄 1-Double-Pole-Normally-Open.webp
       📄 2-Double-Pole-Normally-Closed.webp
       📄 3-Position-Key-Switch-Arrangement.webp
+    📁 HERO
+      📄 01.webp
+      📄 02.webp
+      📄 03.webp
+      📄 04.webp
+      📄 05.webp
     📁 LABEL
       📄 CL-Custom-Label.webp
       📄 Self-Assemble-Label-Kit.webp
@@ -468,6 +529,12 @@
       📄 NY Yellow no label.webp
     📁 COVER
       📄 14 Low profile cover.webp
+    📁 HERO
+      📄 01.webp
+      📄 02.webp
+      📄 03.webp
+      📄 04.webp
+      📄 05.webp
     📁 HOUSING SHELL
       📄 00 No Label Hood.webp
       📄 10 Label Hood without Sounder.webp
@@ -576,6 +643,13 @@
       📄 02-Single-Pole-Changeover, Series 02.webp
       📄 05-05-Sav-wire (2-wire) 470680_Resistor Value_Diode, Series 05.webp
       📄 11-11-Double-Pole-Changeover, Series 11.webp
+    📁 HERO
+      📄 01.webp
+      📄 02.webp
+      📄 03.webp
+      📄 04.webp
+      📄 05.webp
+      📄 06.webp
     📁 LABEL
       📄 CL-Custom-Label.webp
       📄 House-Flame-Logo.webp
@@ -3294,6 +3368,20 @@
       📄 0-Contact-Sales.png
       📄 0-No-Cover.webp
       📄 2-Shield.webp
+    📁 HERO
+      📄 01.webp
+      📄 02.webp
+      📄 03.webp
+      📄 04.webp
+      📄 05.webp
+      📄 06.webp
+      📄 07.webp
+      📄 08.webp
+      📄 09.webp
+      📄 10.webp
+      📄 11.webp
+      📄 12.webp
+      📄 13.webp
     📁 INSTALLATION OPTIONS
       📄 KIT-71100A-B Blue Back Box for Surface Mounting.webp
       📄 KIT-71100A-E Orange Back Box for Surface Mounting.webp
@@ -3347,6 +3435,13 @@
     📁 COVER
       📄 13 Dome cover.webp
       📄 14 Low profile cover.webp
+    📁 HERO
+      📄 01.webp
+      📄 02.webp
+      📄 03.webp
+      📄 04.webp
+      📄 05.webp
+      📄 07.webp
     📁 HOOD & SOUNDER
       📄 00 No Label Hood.webp
       📄 10 Label Hood without Sounder.webp
@@ -3437,6 +3532,13 @@
         📄 WSS3-5Y14.webp
     📁 ELECTRICAL ARRANGEMENTS
       📄 4-Multi-Functional-Signal-(SPC-DPC).webp
+    📁 HERO
+      📄 01.webp
+      📄 02.webp
+      📄 03.webp
+      📄 04.webp
+      📄 05.webp
+      📄 06.webp
     📁 HOUSING COLOUR & MOUNTING
       📄 1-Red (Surface Mount).webp
       📄 3-Green (Surface Mount).webp
@@ -3488,6 +3590,11 @@
       📄 01-Conventional-Fire-Model-(EN54-11-approved).webp
       📄 02-Single-Pole-Changeover.webp
       📄 11-Double-Pole-Changeover.webp
+    📁 HERO
+      📄 01.webp
+      📄 02.webp
+      📄 03.webp
+      📄 04.webp
     📁 LABEL
       📄 CL-Custom-Label.webp
       📄 House-Flame-Logo.webp
@@ -3539,11 +3646,21 @@
       📄 waterproofPushButtons.ts
       📄 waterproofResetCallPoint.ts
     📁 models
+      📄 alertPoint.ts
+      📄 callPointStopper.ts
+      📄 enviroArmour.ts
+      📄 enviroStopper.ts
+      📄 euroStopper.ts
+      📄 g3MultipurposePushButton.ts
+      📄 gfFireAlarmPushButton.ts
+      📄 globalReset.ts
       📄 index.ts
       📄 indoorPushButtons.ts
       📄 keySwitches.ts
+      📄 lowProfileUniversalStopper.ts
       📄 resetCallPoints.ts
       📄 stopperStations.ts
+      📄 universalStopper.ts
       📄 waterproofPushButtons.ts
       📄 waterproofResetCallPoint.ts
     📄 steps.ts
@@ -3559,13 +3676,20 @@
     📄 MyListPage.tsx
     📄 NotFoundPage.tsx
   📁 rules
+    📄 alertPointRules.ts
+    📄 callPointStopperRules.ts
     📄 constraintEngine.ts
+    📄 enviroArmourRules.ts
+    📄 enviroStopperRules.ts
+    📄 globalResetRules.ts
     📄 index.ts
     📄 indoorPushButtonsRules.ts
     📄 keySwitchesRules.ts
+    📄 lowProfileUniversalStopperRules.ts
     📄 resetCallPointsRules.ts
     📄 stopperStationsRules.ts
     📄 types.ts
+    📄 universalStopperRules.ts
     📄 waterproofPushButtonsRules.ts
     📄 waterproofResetCallPointRules.ts
   📁 stores

@@ -85,6 +85,20 @@ const MODEL_CUSTOM_TEXT_CONFIG: Partial<Record<ModelId, CustomTextConfig>> = {
     maxLength: 10,
     line2Required: false,
   },
+  "call-point-stopper": {
+    stepId: "label",
+    optionId: "CL",
+    variant: "multiline-selectable",
+    maxLength: { oneLine: 30, twoLines: 30 },
+    line2Required: false,
+  },
+  "euro-stopper": {
+    stepId: "colourLabel",
+    optionId: "C",
+    variant: "multiline-fixed",
+    maxLength: 20,
+    line2Required: false,
+  },
 };
 
 export function getCustomTextConfig(modelId: ModelId): CustomTextConfig | null {
@@ -113,7 +127,7 @@ export function isCustomTextOptionSelected(modelId: ModelId, configuration: Conf
   const selectedOption = configuration[config.stepId];
   if (!selectedOption) return false;
   
-  if (modelId === "universal-stopper" || modelId === "low-profile-universal-stopper" || modelId === "enviro-stopper") {
+  if (modelId === "universal-stopper" || modelId === "low-profile-universal-stopper" || modelId === "enviro-stopper" || modelId === "euro-stopper") {
     return selectedOption.startsWith("C") && selectedOption !== "NC";
   }
   
@@ -197,7 +211,7 @@ export function shouldClearCustomText(
   return false;
 }
 
-export function getMaxLength(modelId: ModelId, lineCount: 1 | 2): number {
+export function getMaxLength(modelId: ModelId, lineCount: 1 | 2 | 3): number {
   const config = getCustomTextConfig(modelId);
   if (!config) return 20;
   

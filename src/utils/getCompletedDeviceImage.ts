@@ -199,6 +199,46 @@ const MODEL_CONFIG: Record<string, {
     },
     colourStep: "colour",
   },
+  "call-point-stopper": {
+    basePath: "/Call Point Stopper/COMPLETED DEVICE",
+    colourMap: {
+      "R": "RED",
+      "G": "GREEN",
+      "Y": "YELLOW",
+      "W": "WHITE",
+      "B": "BLUE",
+      "E": "ORANGE",
+    },
+    colourStep: "colour",
+  },
+  "enviro-armour": {
+    basePath: "/EnviroArmour/COMPLETED DEVICE",
+    colourMap: {
+      "T": "POLYCARBONATE",
+      "S": "FIBREGLASS",
+    },
+    colourStep: "material",
+  },
+  "euro-stopper": {
+    basePath: "/Euro Stopper/COMPLETED DEVICE",
+    colourMap: {
+      "NK": "BLACK",
+      "NB": "BLUE",
+      "NG": "GREEN",
+      "NE": "ORANGE",
+      "NR": "RED",
+      "NW": "WHITE",
+      "NY": "YELLOW",
+      "CK": "BLACK",
+      "CB": "BLUE",
+      "CG": "GREEN",
+      "CE": "ORANGE",
+      "CR": "RED",
+      "CW": "WHITE",
+      "CY": "YELLOW",
+    },
+    colourStep: "colourLabel",
+  },
 };
 
 export function getCompletedDeviceImage({

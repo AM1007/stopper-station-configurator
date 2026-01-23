@@ -4,16 +4,46 @@ import { ConfiguratorCard } from "../components/ConfiguratorCard";
 export function HomePage() {
   return (
     <div className="min-h-screen bg-gray-50">
-      <section className="bg-brand-700 text-white py-12 md:py-20">
-        <div className="max-w-6xl mx-auto px-4">
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-center mb-4">
-            Build <span className="bg-white text-black px-2">it</span>
-          </h1>
-
-          <p className="text-lg md:text-xl text-red-100 text-center max-w-2xl mx-auto">
-            Configure your safety products with our interactive configurator.
-            Select a product to get started.
-          </p>
+      <section className="relative flex min-h-106.5 items-center py-10 lg:min-h-145 lg:py-12">
+        <img
+          alt=""
+          src="/hero.avif"
+          className="absolute inset-0 z-0 hidden h-full w-full object-cover md:block"
+        />
+        <img
+          alt=""
+          src="/hero-portrait.avif"
+          className="absolute inset-0 z-0 block h-full w-full object-cover md:hidden"
+        />
+        
+        <span className="absolute inset-0 z-1 h-full w-full bg-black/60" />
+        
+        <div className="container relative z-10 mx-auto px-4">
+          <div className="mx-auto grid w-full max-w-6xl grid-cols-1 items-center gap-5 md:gap-12 lg:grid-cols-[1.5fr_1fr] lg:gap-16 xl:gap-24">
+           
+            <div className="order-2 flex flex-col gap-5 overflow-hidden wrap-break-word text-center lg:order-1 lg:gap-8 lg:text-left">
+              <h1 className="max-w-185 text-4xl font-bold text-white md:text-5xl lg:text-5xl xl:text-6xl">
+                Build It Configurators
+              </h1>
+              <p className="text-base font-normal text-white lg:text-xl">
+                STI's Build It Configurator collection brings together customizable push buttons, 
+                call points, protective covers, enclosures, and other activation and protection 
+                devices for fire, security, and access-control applications. Each product series 
+                includes an interactive configurator that lets you tailor materials, activation 
+                methods, mounting options, and protective features to fit your exact requirements.
+              </p>
+            </div>
+            
+            <div className="relative order-1 h-fit overflow-hidden lg:order-2">
+              <img
+                alt="Build It Configurator Device"
+                src="/hero-device.webp"
+                width={800}
+                height={800}
+                className="block h-full w-full object-contain"
+              />
+            </div>
+          </div>
         </div>
       </section>
 
