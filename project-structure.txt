@@ -3713,6 +3713,7 @@
   📄 types.ts
   📁 utils
     📄 buildProductModel.ts
+    📄 configSerializer.ts
     📄 customTextHelpers.ts
     📄 filterOptions.ts
     📄 generateProductPdf.ts

@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import { useConfigurationStore, useMyList } from "../stores/configurationStore";
 import { ProductCard } from "../components/ProductCard";
 import { toast } from "../utils/toast";
+import { downloadMyListXlsx } from "../utils/generateMyListXlsx";
 
 export function MyListPage() {
   const myList = useMyList();
@@ -12,6 +13,10 @@ export function MyListPage() {
     toast.confirm("Are you sure you want to clear all saved configurations?", () => {
       clearMyList();
     });
+  };
+
+  const handleDownloadMyList = () => {
+    downloadMyListXlsx(myList);
   };
 
   return (
@@ -31,9 +36,10 @@ export function MyListPage() {
               <div className="flex gap-3">
                 <button
                   type="button"
+                  onClick={handleDownloadMyList}
                   className="cursor-pointer inline-flex items-center justify-center relative ring-offset-0 transition-all duration-300 ease-in-out focus-visible:outline-none box-border font-bold text-sm gap-1 px-4.5 py-0.5 min-h-9 border-4 lg:gap-1.5 lg:px-6 lg:py-1 lg:min-h-11 lg:text-base bg-brand-600 border-brand-600 text-white hover:bg-brand-700 hover:border-brand-700 h-max w-full basis-1/2 text-nowrap"
                 >
-                  Send My List
+                  Download My List
                 </button>
                 <div className="w-full basis-1/2">
                   <button
@@ -76,7 +82,7 @@ function EmptyState() {
       </div>
 
       <div className="text-center py-16 bg-white border-2 border-gray-200">
-        <div className="text-6xl mb-4">☆</div>
+        <div className="text-6xl mb-4">â˜†</div>
         <h2 className="text-xl font-bold text-gray-800 mb-2">
           Your list is empty
         </h2>

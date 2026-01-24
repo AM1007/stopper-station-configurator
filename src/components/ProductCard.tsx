@@ -3,6 +3,7 @@ import type { SavedConfiguration } from "../types";
 import { MODEL_NAMES } from "../types";
 import { getModelById } from "../data/models";
 import { getCompletedDeviceImage } from "../utils/getCompletedDeviceImage";
+import { buildShareableUrl } from "../utils/configSerializer";
 
 interface ProductCardProps {
   item: SavedConfiguration;
@@ -21,7 +22,12 @@ export function ProductCard({ item, onRemove }: ProductCardProps) {
   });
 
   const configuratorUrl = model
-    ? `/?model=${model.slug}&productModel=${encodeURIComponent(item.productCode)}#build-it`
+    ? buildShareableUrl(
+        `/configurator/${model.slug}`,
+        model.id,
+        item.configuration,
+        item.customText
+      )
     : "/";
 
   const handleRemoveClick = (e: React.MouseEvent) => {
@@ -135,3 +141,4 @@ function ArrowRightIcon() {
     </svg>
   );
 }
+
