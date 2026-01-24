@@ -149,6 +149,8 @@ export function MainPanel({
                   showActionButtons={showActionButtons}
                   productModel={productModel}
                   modelId={model.id}
+                  config={config}
+                  customText={customText}
                   onReset={onReset}
                   onAddToMyList={onAddToMyList}
                   onRemoveFromMyList={onRemoveFromMyList}
@@ -171,6 +173,8 @@ export function MainPanel({
                       <ActionButtons
                         productModel={productModel}
                         modelId={model.id}
+                        config={config}
+                        customText={customText}
                         onReset={onReset}
                         onAddToMyList={onAddToMyList}
                         onRemoveFromMyList={onRemoveFromMyList}
@@ -204,6 +208,8 @@ interface ProductPreviewContentProps {
   showActionButtons: boolean;
   productModel: ProductModel;
   modelId: ModelId;
+  config: Configuration;
+  customText?: CustomTextData | null;
   onReset: () => void;
   onAddToMyList: () => void;
   onRemoveFromMyList: () => void;
@@ -218,6 +224,8 @@ function ProductPreviewContent({
   showActionButtons,
   productModel,
   modelId,
+  config,
+  customText,
   onReset,
   onAddToMyList,
   onRemoveFromMyList,
@@ -274,6 +282,8 @@ function ProductPreviewContent({
           <ActionButtons
             productModel={productModel}
             modelId={modelId}
+            config={config}
+            customText={customText}
             onReset={onReset}
             onAddToMyList={onAddToMyList}
             onRemoveFromMyList={onRemoveFromMyList}

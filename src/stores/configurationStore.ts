@@ -42,6 +42,7 @@ interface ConfigurationState {
   removeFromMyList: (id: string) => void;
   clearMyList: () => void;
   loadFromMyList: (id: string) => void;
+  loadConfigFromUrl: (modelId: ModelId, config: Configuration, customText: CustomTextData | null) => void;
   getModel: () => ModelDefinition | null;
   isComplete: () => boolean;
   getMissingSteps: () => StepId[];
@@ -231,6 +232,31 @@ export const useConfigurationStore = create<ConfigurationState>()(
           currentModelId: saved.modelId,
           config: { ...saved.configuration },
           customText: saved.customText ?? null,
+          currentStep: model.stepOrder[model.stepOrder.length - 1],
+        });
+      },
+
+      loadConfigFromUrl: (modelId, config, customText) => {
+        const model = getModelById(modelId);
+        if (!model) {
+          console.warn(`Model not found: ${modelId}`);
+          return;
+        }
+
+        // Validate config - only keep valid step selections
+        const validatedConfig: Configuration = {};
+        for (const stepId of model.stepOrder) {
+          const value = config[stepId];
+          if (value !== undefined && value !== null) {
+            // TODO: Could add deeper validation here (check if option exists and is available)
+            validatedConfig[stepId] = value;
+          }
+        }
+
+        set({
+          currentModelId: modelId,
+          config: validatedConfig,
+          customText: customText,
           currentStep: model.stepOrder[model.stepOrder.length - 1],
         });
       },

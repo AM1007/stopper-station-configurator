@@ -1,13 +1,16 @@
 import { useEffect, useRef, useState } from "react";
-import type { ProductModel, ModelId } from "../types";
+import type { ProductModel, ModelId, Configuration, CustomTextData } from "../types";
 import { toast } from "../utils/toast";
 import { downloadProductPdf, printProductPdf } from "../utils/generateProductPdf";
 import { stripHtml } from "../utils/stripHtml";
+import { buildShareableUrl } from "../utils/configSerializer";
 import type { ProductPdfData } from "./ProductPdfDocument";
 
 interface ShareMenuProps {
   productModel: ProductModel;
   modelId?: ModelId;
+  config: Configuration;
+  customText?: CustomTextData | null;
   onClose: () => void;
   // PDF data
   productName?: string;
@@ -18,6 +21,8 @@ interface ShareMenuProps {
 export function ShareMenu({
   productModel,
   modelId,
+  config,
+  customText,
   onClose,
   productName,
   productDescription,
@@ -57,17 +62,17 @@ export function ShareMenu({
   };
 
   const handleCopyURL = () => {
-    const baseUrl = `${window.location.origin}/configurator`;
-    const params = new URLSearchParams({
-      ...(modelId && { model: modelId }),
-      code: productModel.fullCode,
-    });
-    const url = `${baseUrl}?${params.toString()}`;
+    if (!modelId) {
+      toast.error("Cannot generate URL: model ID is missing");
+      return;
+    }
+
+    const baseUrl = `${window.location.origin}/configurator/${modelId}`;
+    const url = buildShareableUrl(baseUrl, modelId, config, customText);
     copyToClipboard(url, "URL copied to clipboard!");
   };
 
   const getPdfData = (): ProductPdfData => {
-    // PNG format required - @react-pdf/renderer doesn't support SVG
     const logoUrl = `${window.location.origin}/pdf-logo.png`;
     
     return {

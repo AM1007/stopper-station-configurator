@@ -1,7 +1,58 @@
 import { pdf } from "@react-pdf/renderer";
 import { ProductPdfDocument, type ProductPdfData } from "../components/ProductPdfDocument";
 
+
+async function convertImageToPngBase64(imageUrl: string): Promise<string | null> {
+  try {
+    const response = await fetch(imageUrl);
+    
+    if (!response.ok) {
+      console.warn(`Failed to fetch image: ${response.status}`);
+      return null;
+    }
+    
+    const blob = await response.blob();
+    
+    const img = new window.Image();
+    img.crossOrigin = "anonymous";
+    
+    const imageLoadPromise = new Promise<HTMLImageElement>((resolve, reject) => {
+      img.onload = () => resolve(img);
+      img.onerror = () => reject(new Error("Failed to load image"));
+    });
+    
+    img.src = URL.createObjectURL(blob);
+    
+    const loadedImg = await imageLoadPromise;
+    
+    const canvas = document.createElement("canvas");
+    canvas.width = loadedImg.naturalWidth;
+    canvas.height = loadedImg.naturalHeight;
+    
+    const ctx = canvas.getContext("2d");
+    if (!ctx) {
+      console.warn("Failed to get canvas context");
+      return null;
+    }
+    
+    ctx.drawImage(loadedImg, 0, 0);
+    
+    URL.revokeObjectURL(img.src);
+    
+    const pngBase64 = canvas.toDataURL("image/png");
+    
+    return pngBase64;
+  } catch (error) {
+    console.warn("Failed to convert image to PNG base64:", error);
+    return null;
+  }
+}
+
 async function fetchImageAsBase64(imageUrl: string): Promise<string | null> {
+  if (imageUrl.toLowerCase().includes(".webp")) {
+    return convertImageToPngBase64(imageUrl);
+  }
+  
   try {
     const response = await fetch(imageUrl);
     
