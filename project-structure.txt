@@ -275,6 +275,9 @@
       📄 RM Running Man Logo.webp
       📄 XT EXIT.webp
       📄 ZA NON-RETURNABLE custom text.webp
+  📄 hero-device.webp
+  📄 hero-portrait.avif
+  📄 hero.avif
   📁 icons
     📄 sound.webp
     📄 weather.webp
@@ -3613,6 +3616,13 @@
     📄 BuildItCalculator.tsx
     📄 CompletedDevicePreview.tsx
     📄 ConfiguratorCard.tsx
+    📁 ConfiguratorHero
+      📄 ConfiguratorHero.tsx
+      📄 HeroContent.tsx
+      📄 HeroGallery.tsx
+      📄 index.ts
+      📄 types.ts
+      📄 VideoModal.tsx
     📄 CustomTextDisplay.tsx
     📄 CustomTextForm.tsx
     📄 Layout.tsx
@@ -3622,6 +3632,7 @@
     📄 ProductCard.tsx
     📄 ProductModelDisplay.tsx
     📄 ProductPreview.tsx
+    📄 ScrollToTop.tsx
     📄 ShareMenu.tsx
     📄 Sidebar.tsx
     📄 StepSelector.tsx
@@ -3645,6 +3656,7 @@
       📄 universalStopper.ts
       📄 waterproofPushButtons.ts
       📄 waterproofResetCallPoint.ts
+    📄 heroContent.ts
     📁 models
       📄 alertPoint.ts
       📄 callPointStopper.ts

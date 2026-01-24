@@ -59,19 +59,11 @@ export function HeroGallery({ media, productName }: HeroGalleryProps) {
   };
 
   const getMaskClass = (): string => {
-    // Mobile: horizontal (left/right)
-    // Desktop: vertical (top/bottom)
-    // start = в начале, градиент только снизу/справа
-    // end = в конце, градиенты с обеих сторон (как middle)
-    // middle = посередине, градиенты с обеих сторон
-    // none = нет скролла, без градиентов
     switch (scrollPosition) {
       case "start":
-        // В начале — градиент только снизу (desktop) / справа (mobile)
         return "[mask-image:linear-gradient(to_right,#000_calc(100%-100px),transparent)] lg:[mask-image:linear-gradient(to_bottom,#000_calc(100%-100px),transparent)]";
       case "end":
       case "middle":
-        // В конце или посередине — градиенты с обеих сторон
         return "[mask-image:linear-gradient(to_right,transparent,#000_100px,#000_calc(100%-100px),transparent)] lg:[mask-image:linear-gradient(to_bottom,transparent,#000_100px,#000_calc(100%-100px),transparent)]";
       default:
         return "";

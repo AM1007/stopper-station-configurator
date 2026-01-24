@@ -1,15 +1,30 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { ProductModel, ModelId } from "../types";
 import { toast } from "../utils/toast";
+import { downloadProductPdf, printProductPdf } from "../utils/generateProductPdf";
+import { stripHtml } from "../utils/stripHtml";
+import type { ProductPdfData } from "./ProductPdfDocument";
 
 interface ShareMenuProps {
   productModel: ProductModel;
   modelId?: ModelId;
   onClose: () => void;
+  // PDF data
+  productName?: string;
+  productDescription?: string;
+  productImageUrl?: string | null;
 }
 
-export function ShareMenu({ productModel, modelId, onClose }: ShareMenuProps) {
+export function ShareMenu({
+  productModel,
+  modelId,
+  onClose,
+  productName,
+  productDescription,
+  productImageUrl,
+}: ShareMenuProps) {
   const menuRef = useRef<HTMLDivElement>(null);
+  const [isGeneratingPdf, setIsGeneratingPdf] = useState(false);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -51,38 +66,57 @@ export function ShareMenu({ productModel, modelId, onClose }: ShareMenuProps) {
     copyToClipboard(url, "URL copied to clipboard!");
   };
 
-  const handleEmail = () => {
-    const subject = encodeURIComponent(
-      `Product Configuration: ${productModel.fullCode}`
-    );
-    const shareUrl = `${window.location.origin}/configurator?code=${productModel.fullCode}`;
-    const body = encodeURIComponent(
-      `I've configured a product:\n\n` +
-        `Model: ${productModel.fullCode}\n\n` +
-        `View configuration: ${shareUrl}\n\n` +
-        `---\n` +
-        `Sent from Build It Configurator`
-    );
-    window.location.href = `mailto:?subject=${subject}&body=${body}`;
-    onClose();
+  const getPdfData = (): ProductPdfData => {
+    // PNG format required - @react-pdf/renderer doesn't support SVG
+    const logoUrl = `${window.location.origin}/pdf-logo.png`;
+    
+    return {
+      productName: productName ?? "Product Configuration",
+      modelNumber: productModel.fullCode,
+      description: productDescription ? stripHtml(productDescription) : "",
+      imageUrl: productImageUrl ? `${window.location.origin}${productImageUrl}` : null,
+      logoUrl,
+    };
   };
 
-  const handlePrint = () => {
-    window.print();
-    onClose();
+  const handleSavePDF = async () => {
+    if (isGeneratingPdf) return;
+    
+    setIsGeneratingPdf(true);
+    try {
+      const pdfData = getPdfData();
+      await downloadProductPdf(pdfData);
+      toast.success("PDF downloaded successfully!");
+    } catch (error) {
+      console.error("PDF generation failed:", error);
+      toast.error("Failed to generate PDF. Please try again.");
+    } finally {
+      setIsGeneratingPdf(false);
+      onClose();
+    }
   };
 
-  const handleSavePDF = () => {
-    window.print();
-    onClose();
+  const handlePrint = async () => {
+    if (isGeneratingPdf) return;
+    
+    setIsGeneratingPdf(true);
+    try {
+      const pdfData = getPdfData();
+      await printProductPdf(pdfData);
+    } catch (error) {
+      console.error("PDF generation failed:", error);
+      toast.error("Failed to generate PDF. Please try again.");
+    } finally {
+      setIsGeneratingPdf(false);
+      onClose();
+    }
   };
 
   const menuItems = [
-    { icon: <EmailIcon />, label: "Email", onClick: handleEmail },
-    { icon: <SaveIcon />, label: "Save PDF", onClick: handleSavePDF },
-    { icon: <PrintIcon />, label: "Print", onClick: handlePrint },
-    { icon: <LinkIcon />, label: "Copy URL", onClick: handleCopyURL },
-    { icon: <CopyIcon />, label: "Copy Model ID", onClick: handleCopyModelId },
+    { icon: <SaveIcon />, label: isGeneratingPdf ? "Generating..." : "Save PDF", onClick: handleSavePDF, disabled: isGeneratingPdf },
+    { icon: <PrintIcon />, label: "Print", onClick: handlePrint, disabled: isGeneratingPdf },
+    { icon: <LinkIcon />, label: "Copy URL", onClick: handleCopyURL, disabled: false },
+    { icon: <CopyIcon />, label: "Copy Model ID", onClick: handleCopyModelId, disabled: false },
   ];
 
   return (
@@ -106,8 +140,10 @@ export function ShareMenu({ productModel, modelId, onClose }: ShareMenuProps) {
             type="button"
             className="w-full text-left px-3 py-2 hover:bg-gray-100 
                        text-sm text-gray-700 flex items-center gap-3
-                       focus:bg-gray-100 focus:outline-none"
+                       focus:bg-gray-100 focus:outline-none
+                       disabled:opacity-50 disabled:cursor-not-allowed"
             onClick={item.onClick}
+            disabled={item.disabled}
             role="menuitem"
             tabIndex={index === 0 ? 0 : -1}
           >
@@ -117,19 +153,6 @@ export function ShareMenu({ productModel, modelId, onClose }: ShareMenuProps) {
         ))}
       </div>
     </>
-  );
-}
-
-function EmailIcon() {
-  return (
-    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-      <path
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        strokeWidth={2}
-        d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
-      />
-    </svg>
   );
 }
 

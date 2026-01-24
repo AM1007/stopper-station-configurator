@@ -1,12 +1,13 @@
 import { useState, useEffect } from "react";
 import { ClipLoader } from "react-spinners";
-import type { Configuration, ProductModel, ModelDefinition, StepId, CustomTextData } from "../types";
+import type { Configuration, ProductModel, ModelDefinition, StepId, CustomTextData, ModelId } from "../types";
 import { ProductPreview } from "./ProductPreview";
 import { ProductModelDisplay } from "./ProductModelDisplay";
 import { ActionButtons } from "./ActionButtons";
 import { CustomTextForm } from "./CustomTextForm";
 import { getCompletedDeviceImage } from "../utils/getCompletedDeviceImage";
 import { shouldShowCustomTextForm, getCustomTextConfig, getMaxLength, getEffectiveLineCount, isConfigurationReadyForActions } from "../utils/customTextHelpers";
+import { getHeroContent } from "../data/heroContent";
 
 type TabId = "edit" | "preview";
 
@@ -15,6 +16,7 @@ interface MainPanelProps {
   config: Configuration;
   customText: CustomTextData | null;
   productModel: ProductModel;
+  productName: string;
   onEditStep: (stepId: StepId) => void;
   onReset: () => void;
   onAddToMyList: () => void;
@@ -29,6 +31,7 @@ export function MainPanel({
   config,
   customText,
   productModel,
+  productName,
   onEditStep,
   onReset,
   onAddToMyList,
@@ -42,6 +45,9 @@ export function MainPanel({
   const showCustomTextForm = shouldShowCustomTextForm(model, config, customText);
   const customTextConfig = getCustomTextConfig(model.id);
   const showActionButtons = productModel.isComplete && isConfigurationReadyForActions(model.id, config, customText);
+
+  // Get hero content for PDF description
+  const heroContent = getHeroContent(model.id);
 
   useEffect(() => {
     if (customText?.submitted) {
@@ -142,10 +148,13 @@ export function MainPanel({
                   productCode={productModel.fullCode}
                   showActionButtons={showActionButtons}
                   productModel={productModel}
+                  modelId={model.id}
                   onReset={onReset}
                   onAddToMyList={onAddToMyList}
                   onRemoveFromMyList={onRemoveFromMyList}
                   isInMyList={isInMyList}
+                  productName={productName}
+                  productDescription={heroContent?.description}
                 />
               ) : (
                 <div className="flex w-full flex-col items-center gap-11 py-16 text-center text-gray-500">
@@ -161,10 +170,14 @@ export function MainPanel({
                     <div className="flex w-full flex-wrap items-center justify-center gap-2 md:items-start md:gap-6 mt-4">
                       <ActionButtons
                         productModel={productModel}
+                        modelId={model.id}
                         onReset={onReset}
                         onAddToMyList={onAddToMyList}
                         onRemoveFromMyList={onRemoveFromMyList}
                         isInMyList={isInMyList}
+                        productName={productName}
+                        productDescription={heroContent?.description}
+                        productImageUrl={null}
                       />
                     </div>
                   )}
@@ -190,10 +203,13 @@ interface ProductPreviewContentProps {
   productCode: string;
   showActionButtons: boolean;
   productModel: ProductModel;
+  modelId: ModelId;
   onReset: () => void;
   onAddToMyList: () => void;
   onRemoveFromMyList: () => void;
   isInMyList: boolean;
+  productName: string;
+  productDescription?: string;
 }
 
 function ProductPreviewContent({
@@ -201,10 +217,13 @@ function ProductPreviewContent({
   productCode,
   showActionButtons,
   productModel,
+  modelId,
   onReset,
   onAddToMyList,
   onRemoveFromMyList,
   isInMyList,
+  productName,
+  productDescription,
 }: ProductPreviewContentProps) {
   const [hasError, setHasError] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
@@ -254,14 +273,17 @@ function ProductPreviewContent({
         <div className="flex w-full flex-wrap items-center justify-center gap-2 md:items-start md:gap-6">
           <ActionButtons
             productModel={productModel}
+            modelId={modelId}
             onReset={onReset}
             onAddToMyList={onAddToMyList}
             onRemoveFromMyList={onRemoveFromMyList}
             isInMyList={isInMyList}
+            productName={productName}
+            productDescription={productDescription}
+            productImageUrl={imagePath}
           />
         </div>
       )}
     </div>
   );
 }
-
