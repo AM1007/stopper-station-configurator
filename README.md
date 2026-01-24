@@ -1,73 +1,100 @@
-# React + TypeScript + Vite
+# STI Build It Configurator
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Internal product configurator for Safety Technology International (STI). Enables sales engineers, distributors, and customers to configure activation and protection devices with real-time constraint validation and Product Model ID generation.
 
-Currently, two official plugins are available:
+## Product Lines
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+| Category | Products |
+|----------|----------|
+| Push Buttons | G3 Multipurpose, GF Fire Alarm, Indoor, Waterproof |
+| Call Points | Global ReSet, ReSet Call Points, Waterproof ReSet |
+| Protective Covers | Universal Stopper, Low Profile Universal Stopper, Enviro Stopper, Euro Stopper, Call Point Stopper |
+| Enclosures | EnviroArmour |
+| Other | Key Switches, Alert Point, Stopper Stations |
 
-## React Compiler
+**Total: 16 configurable product families**
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## Architecture
 
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```
+src/
+├── components/        # UI components (dumb, no business logic)
+├── data/
+│   ├── catalog/       # Product definitions (steps, options, images)
+│   ├── models/        # Product Model ID schemas
+│   └── heroContent.ts # Product landing page content
+├── rules/             # Constraint engine + per-product rules
+├── stores/            # Zustand stores (configuration, myList)
+├── hooks/             # React hooks
+├── pages/             # Route components
+└── utils/             # Helpers (PDF generation, image mapping, etc.)
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+### Key Patterns
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+- **Constraint Engine**: Matrix-based option filtering. Rules are decoupled from UI.
+- **Product Model ID**: Generated from selections. Format varies per product family.
+- **My List**: Immutable configuration snapshots with share/export capabilities.
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+## Tech Stack
+
+- React 19
+- TypeScript 5.9
+- Vite 7
+- Tailwind CSS 4.1
+- Zustand (state management)
+- React Router 7
+- @react-pdf/renderer (PDF export)
+
+## Getting Started
+
+```bash
+npm install
+npm run dev
 ```
+
+## Routes
+
+| Path | Description |
+|------|-------------|
+| `/` | Product catalog grid |
+| `/configurator/:modelId` | Configuration wizard |
+| `/my-list` | Saved configurations |
+
+## Constraint System
+
+Each product has a dedicated rules file (`src/rules/<product>Rules.ts`) defining a constraint matrix:
+
+```typescript
+{
+  sourceStep: "colour",
+  targetStep: "cover",
+  matrix: {
+    "red": ["cover-a", "cover-b"],
+    "blue": ["cover-a"]
+  }
+}
+```
+
+The `ConstraintEngine` evaluates selections and returns:
+- `available: boolean`
+- `reasons: BlockReason[]` (explains why option is disabled)
+
+Disabled options are **never hidden** — always shown with explanation.
+
+## Build & Deploy
+
+```bash
+npm run build    # Production build
+npm run preview  # Preview production build
+```
+
+Deployed via Vercel with SPA rewrite configuration.
+
+## Project Status
+
+Active development. Not all 16 configurators are fully implemented — check `src/pages/InDevelopmentPage.tsx` for placeholder routes.
+
+## License
+
+Proprietary. Internal use only.
