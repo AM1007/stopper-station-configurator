@@ -113,6 +113,11 @@
     "defaultProductName": "Product Configuration"
   },
 
+  "pdf": {
+    "descriptionLabel": "Description:",
+    "modelNumberLabel": "Model Number:"
+  },
+
   "validation": {
     "requiredField": "This field is required",
     "maxLength": "Maximum length: {max} characters",

@@ -24,6 +24,17 @@ interface I18nContextValue {
 
 const I18nContext = createContext<I18nContextValue | null>(null);
 
+// Vite-compatible glob imports for translations
+const commonModules = import.meta.glob<{ default: TranslationData }>(
+  "./locales/*/common.json",
+  { eager: false }
+);
+
+const modelModules = import.meta.glob<{ default: TranslationData }>(
+  "./locales/*/models/*.json",
+  { eager: false }
+);
+
 function getStoredLanguage(): Language {
   if (typeof window === "undefined") return DEFAULT_LANGUAGE;
   
@@ -61,16 +72,37 @@ function interpolate(
 }
 
 async function loadCommonTranslations(lang: Language): Promise<TranslationData> {
-  const module = await import(`./locales/${lang}/common.json`);
-  return module.default;
+  const path = `./locales/${lang}/common.json`;
+  const loader = commonModules[path];
+  
+  if (!loader) {
+    console.warn(`[i18n] Common translations not found for path: ${path}`);
+    return {};
+  }
+  
+  try {
+    const module = await loader();
+    return module.default;
+  } catch (error) {
+    console.error(`[i18n] Failed to load common translations for ${lang}:`, error);
+    return {};
+  }
 }
 
 async function loadModelTranslationsFile(
   lang: Language,
   modelId: string
 ): Promise<TranslationData> {
+  const path = `./locales/${lang}/models/${modelId}.json`;
+  const loader = modelModules[path];
+  
+  if (!loader) {
+    // Silent fail - model translations are optional
+    return {};
+  }
+  
   try {
-    const module = await import(`./locales/models/${lang}/${modelId}.json`);
+    const module = await loader();
     return module.default;
   } catch {
     return {};

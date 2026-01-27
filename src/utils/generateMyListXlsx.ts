@@ -1,13 +1,27 @@
 import * as XLSX from "xlsx";
 import type { SavedConfiguration } from "../types";
 import { MODEL_NAMES } from "../types";
+import { getModelDescription } from "./getModelDescription";
 
-interface MyListRow {
+type Language = "en" | "uk";
+
+interface MyListRowEn {
   "№": number;
   "Product Code": string;
   "Model": string;
+  "Description": string;
   "Date Added": string;
 }
+
+interface MyListRowUk {
+  "№": number;
+  "Код продукту": string;
+  "Модель": string;
+  "Опис": string;
+  "Дата додавання": string;
+}
+
+type MyListRow = MyListRowEn | MyListRowUk;
 
 function formatDate(timestamp: number): string {
   const date = new Date(timestamp);
@@ -28,34 +42,70 @@ function formatTimestamp(): string {
   return `${year}-${month}-${day}-${hours}${minutes}${seconds}`;
 }
 
-function buildRows(items: SavedConfiguration[]): MyListRow[] {
-  return items.map((item, index) => ({
-    "№": index + 1,
-    "Product Code": item.productCode,
-    "Model": MODEL_NAMES[item.modelId] ?? item.modelId,
-    "Date Added": formatDate(item.savedAt),
-  }));
+async function buildRows(
+  items: SavedConfiguration[],
+  lang: Language
+): Promise<MyListRow[]> {
+  const rows: MyListRow[] = [];
+
+  for (let index = 0; index < items.length; index++) {
+    const item = items[index];
+    const modelName = MODEL_NAMES[item.modelId] ?? item.modelId;
+    const dateAdded = formatDate(item.savedAt);
+    
+    // Fetch description for this product code
+    const description = await getModelDescription(
+      item.productCode,
+      item.modelId,
+      lang
+    ) ?? "";
+
+    if (lang === "uk") {
+      rows.push({
+        "№": index + 1,
+        "Код продукту": item.productCode,
+        "Модель": modelName,
+        "Опис": description,
+        "Дата додавання": dateAdded,
+      });
+    } else {
+      rows.push({
+        "№": index + 1,
+        "Product Code": item.productCode,
+        "Model": modelName,
+        "Description": description,
+        "Date Added": dateAdded,
+      });
+    }
+  }
+
+  return rows;
 }
 
-export function downloadMyListXlsx(items: SavedConfiguration[]): void {
+export async function downloadMyListXlsx(
+  items: SavedConfiguration[],
+  lang: Language = "en"
+): Promise<void> {
   if (items.length === 0) {
     return;
   }
 
-  const rows = buildRows(items);
+  const rows = await buildRows(items, lang);
 
   const worksheet = XLSX.utils.json_to_sheet(rows);
 
   const columnWidths = [
     { wch: 5 },   // №
-    { wch: 25 },  // Product Code
-    { wch: 30 },  // Model
-    { wch: 12 },  // Date Added
+    { wch: 25 },  // Product Code / Код продукту
+    { wch: 30 },  // Model / Модель
+    { wch: 80 },  // Description / Опис
+    { wch: 14 },  // Date Added / Дата додавання
   ];
   worksheet["!cols"] = columnWidths;
 
   const workbook = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(workbook, worksheet, "My List");
+  const sheetName = lang === "uk" ? "Мій список" : "My List";
+  XLSX.utils.book_append_sheet(workbook, worksheet, sheetName);
 
   const timestamp = formatTimestamp();
   const filename = `my-list-${timestamp}.xlsx`;

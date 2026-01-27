@@ -4,7 +4,8 @@ import { toast } from "../utils/toast";
 import { downloadProductPdf, printProductPdf } from "../utils/generateProductPdf";
 import { stripHtml } from "../utils/stripHtml";
 import { buildShareableUrl } from "../utils/configSerializer";
-import { useTranslation } from "../i18n";
+import { getModelDescription } from "../utils/getModelDescription";
+import { useTranslation, useLanguage } from "../i18n";
 import type { ProductPdfData } from "./ProductPdfDocument";
 
 interface ShareMenuProps {
@@ -29,6 +30,7 @@ export function ShareMenu({
   productImageUrl,
 }: ShareMenuProps) {
   const { t } = useTranslation();
+  const { lang } = useLanguage();
   const menuRef = useRef<HTMLDivElement>(null);
   const [isGeneratingPdf, setIsGeneratingPdf] = useState(false);
 
@@ -73,13 +75,43 @@ export function ShareMenu({
     copyToClipboard(url, t("share.urlCopied"));
   };
 
-  const getPdfData = (): ProductPdfData => {
+  const getPdfData = async (): Promise<ProductPdfData> => {
     const logoUrl = `${window.location.origin}/pdf-logo.png`;
     
+    // Fetch model description based on current language
+    let modelDescription: string | null = null;
+    if (modelId) {
+      modelDescription = await getModelDescription(
+        productModel.fullCode,
+        modelId,
+        lang as "en" | "uk"
+      );
+    }
+
+    // Get localized labels
+    const descriptionLabel = t("pdf.descriptionLabel");
+    const modelNumberLabel = t("pdf.modelNumberLabel");
+    
+    // Get localized heroDescription from model translations
+    // Falls back to prop if translation key returns itself (not found)
+    const localizedHeroDescription = t("meta.heroDescription");
+    const heroDescription = localizedHeroDescription !== "meta.heroDescription" 
+      ? stripHtml(localizedHeroDescription)
+      : (productDescription ? stripHtml(productDescription) : "");
+    
+    // Get localized product name
+    const localizedProductName = t("meta.name");
+    const finalProductName = localizedProductName !== "meta.name"
+      ? localizedProductName
+      : (productName ?? t("share.defaultProductName"));
+    
     return {
-      productName: productName ?? t("share.defaultProductName"),
+      productName: finalProductName,
       modelNumber: productModel.fullCode,
-      description: productDescription ? stripHtml(productDescription) : "",
+      modelNumberLabel,
+      description: heroDescription,
+      modelDescription,
+      descriptionLabel,
       imageUrl: productImageUrl ? `${window.location.origin}${productImageUrl}` : null,
       logoUrl,
     };
@@ -90,7 +122,7 @@ export function ShareMenu({
     
     setIsGeneratingPdf(true);
     try {
-      const pdfData = getPdfData();
+      const pdfData = await getPdfData();
       await downloadProductPdf(pdfData);
       toast.success(t("share.pdfDownloaded"));
     } catch (error) {
@@ -107,7 +139,7 @@ export function ShareMenu({
     
     setIsGeneratingPdf(true);
     try {
-      const pdfData = getPdfData();
+      const pdfData = await getPdfData();
       await printProductPdf(pdfData);
     } catch (error) {
       console.error("PDF generation failed:", error);

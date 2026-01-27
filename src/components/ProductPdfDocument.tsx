@@ -8,19 +8,20 @@ import {
   StyleSheet,
 } from "@react-pdf/renderer";
 
+// Register Roboto font with Cyrillic support from local files
 Font.register({
-  family: "Inter",
+  family: "Roboto",
   fonts: [
     {
-      src: "https://fonts.gstatic.com/s/inter/v18/UcCO3FwrK3iLTeHuS_nVMrMxCp50SjIw2boKoduKmMEVuLyfAZ9hjp-Ek-_EeA.woff",
+      src: "/fonts/Roboto-Regular.ttf",
       fontWeight: 400,
     },
     {
-      src: "https://fonts.gstatic.com/s/inter/v18/UcCO3FwrK3iLTeHuS_nVMrMxCp50SjIw2boKoduKmMEVuI6fAZ9hjp-Ek-_EeA.woff",
-      fontWeight: 600,
+      src: "/fonts/Roboto-Medium.ttf",
+      fontWeight: 500,
     },
     {
-      src: "https://fonts.gstatic.com/s/inter/v18/UcCO3FwrK3iLTeHuS_nVMrMxCp50SjIw2boKoduKmMEVuFuYAZ9hjp-Ek-_EeA.woff",
+      src: "/fonts/Roboto-Bold.ttf",
       fontWeight: 700,
     },
   ],
@@ -30,7 +31,7 @@ const HEADER_COLOR = "#1e2939";
 
 const styles = StyleSheet.create({
   page: {
-    fontFamily: "Inter",
+    fontFamily: "Roboto",
     fontSize: 11,
     paddingBottom: 40,
   },
@@ -55,9 +56,16 @@ const styles = StyleSheet.create({
     color: "#111827",
     marginBottom: 16,
   },
+  heroDescription: {
+    fontSize: 11,
+    lineHeight: 1.6,
+    color: "#374151",
+    marginBottom: 24,
+    textAlign: "justify",
+  },
   modelNumberLabel: {
     fontSize: 10,
-    fontWeight: 600,
+    fontWeight: 500,
     color: "#6b7280",
     marginBottom: 4,
     textTransform: "uppercase",
@@ -65,11 +73,19 @@ const styles = StyleSheet.create({
   },
   modelNumber: {
     fontSize: 14,
-    fontWeight: 600,
+    fontWeight: 500,
     color: "#111827",
     marginBottom: 24,
   },
-  description: {
+  descriptionLabel: {
+    fontSize: 10,
+    fontWeight: 500,
+    color: "#6b7280",
+    marginBottom: 4,
+    textTransform: "uppercase",
+    letterSpacing: 0.5,
+  },
+  modelDescription: {
     fontSize: 11,
     lineHeight: 1.6,
     color: "#374151",
@@ -90,7 +106,10 @@ const styles = StyleSheet.create({
 export interface ProductPdfData {
   productName: string;
   modelNumber: string;
+  modelNumberLabel?: string;
   description: string;
+  modelDescription?: string | null;
+  descriptionLabel?: string;
   imageUrl?: string | null;
   logoUrl: string;
 }
@@ -100,7 +119,16 @@ interface ProductPdfDocumentProps {
 }
 
 export function ProductPdfDocument({ data }: ProductPdfDocumentProps) {
-  const { productName, modelNumber, description, imageUrl, logoUrl } = data;
+  const {
+    productName,
+    modelNumber,
+    modelNumberLabel,
+    description,
+    modelDescription,
+    descriptionLabel,
+    imageUrl,
+    logoUrl,
+  } = data;
 
   return (
     <Document>
@@ -112,10 +140,23 @@ export function ProductPdfDocument({ data }: ProductPdfDocumentProps) {
         <View style={styles.content}>
           <Text style={styles.productName}>{productName}</Text>
 
-          <Text style={styles.modelNumberLabel}>Model Number:</Text>
+          {description && (
+            <Text style={styles.heroDescription}>{description}</Text>
+          )}
+
+          <Text style={styles.modelNumberLabel}>
+            {modelNumberLabel || "Model Number:"}
+          </Text>
           <Text style={styles.modelNumber}>{modelNumber}</Text>
 
-          <Text style={styles.description}>{description}</Text>
+          {modelDescription && (
+            <>
+              <Text style={styles.descriptionLabel}>
+                {descriptionLabel || "Description:"}
+              </Text>
+              <Text style={styles.modelDescription}>{modelDescription}</Text>
+            </>
+          )}
 
           {imageUrl && (
             <View style={styles.imageContainer}>

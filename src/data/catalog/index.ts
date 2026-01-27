@@ -30,7 +30,7 @@ import { enviroStopperMeta } from "./enviroStopper";
 import { indoorPushButtonsMeta } from "./indoorPushButtons";
 import { keySwitchesMeta } from "./keySwitches";
 import { waterproofPushButtonsMeta } from "./waterproofPushButtons";
-import { alertPointMeta } from "./alertPoint";
+// import { alertPointMeta } from "./alertPoint";
 import { callPointStopperMeta } from "./callPointStopper";
 import { enviroArmourMeta } from "./enviroArmour";
 import { euroStopperMeta } from "./euroStopper";
@@ -48,7 +48,7 @@ export const allConfigurators: ConfiguratorMeta[] = [
   indoorPushButtonsMeta,
   keySwitchesMeta,
   waterproofPushButtonsMeta,
-  alertPointMeta,
+  // alertPointMeta, // TEMPORARILY DISABLED — uncomment to restore Alert Point card on Home
   callPointStopperMeta,
   enviroArmourMeta,
   euroStopperMeta,

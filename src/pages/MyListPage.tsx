@@ -1,15 +1,18 @@
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import { useConfigurationStore, useMyList } from "../stores/configurationStore";
 import { ProductCard } from "../components/ProductCard";
 import { toast } from "../utils/toast";
 import { downloadMyListXlsx } from "../utils/generateMyListXlsx";
-import { useTranslation } from "../i18n";
+import { useTranslation, useLanguage } from "../i18n";
 
 export function MyListPage() {
   const { t } = useTranslation();
+  const { lang } = useLanguage();
   const myList = useMyList();
   const removeFromMyList = useConfigurationStore((state) => state.removeFromMyList);
   const clearMyList = useConfigurationStore((state) => state.clearMyList);
+  const [isDownloading, setIsDownloading] = useState(false);
 
   const handleClearAll = () => {
     toast.confirm(t("myList.clearListConfirm"), () => {
@@ -17,8 +20,18 @@ export function MyListPage() {
     });
   };
 
-  const handleDownloadMyList = () => {
-    downloadMyListXlsx(myList);
+  const handleDownloadMyList = async () => {
+    if (isDownloading) return;
+    
+    setIsDownloading(true);
+    try {
+      await downloadMyListXlsx(myList, lang as "en" | "uk");
+    } catch (error) {
+      console.error("Failed to download My List:", error);
+      toast.error(t("toast.errorOccurred"));
+    } finally {
+      setIsDownloading(false);
+    }
   };
 
   return (
@@ -39,9 +52,10 @@ export function MyListPage() {
                 <button
                   type="button"
                   onClick={handleDownloadMyList}
-                  className="cursor-pointer inline-flex items-center justify-center relative ring-offset-0 transition-all duration-300 ease-in-out focus-visible:outline-none box-border font-bold text-sm gap-1 px-4.5 py-0.5 min-h-9 border-4 lg:gap-1.5 lg:px-6 lg:py-1 lg:min-h-11 lg:text-base bg-brand-600 border-brand-600 text-white hover:bg-brand-700 hover:border-brand-700 h-max w-full basis-1/2 text-nowrap"
+                  disabled={isDownloading}
+                  className="cursor-pointer inline-flex items-center justify-center relative ring-offset-0 transition-all duration-300 ease-in-out focus-visible:outline-none box-border font-bold text-sm gap-1 px-4.5 py-0.5 min-h-9 border-4 lg:gap-1.5 lg:px-6 lg:py-1 lg:min-h-11 lg:text-base bg-brand-600 border-brand-600 text-white hover:bg-brand-700 hover:border-brand-700 h-max w-full basis-1/2 text-nowrap disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  {t("myList.downloadList")}
+                  {isDownloading ? t("common.loading") : t("myList.downloadList")}
                 </button>
                 <div className="w-full basis-1/2">
                   <button

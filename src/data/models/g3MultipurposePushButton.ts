@@ -23,7 +23,8 @@ const steps: Step[] = [
       { id: "2", label: "#2 Yellow", code: "2", image: `${IMG}/COLOUR/2 Yellow.webp` },
       { id: "3", label: "#3 White", code: "3", image: `${IMG}/COLOUR/3 white.webp` },
       { id: "4", label: "#4 Blue", code: "4", image: `${IMG}/COLOUR/4 Blue.webp` },
-      { id: "5", label: "#5 Orange", code: "5", image: `${IMG}/COLOUR/5 Orange.webp` },
+      //DISABLED: Not in approved sales list
+      // { id: "5", label: "#5 Orange", code: "5", image: `${IMG}/COLOUR/5 Orange.webp` }, 
     ],
   },
 
@@ -34,13 +35,14 @@ const steps: Step[] = [
     options: [
       { id: "0", label: "#0 No Cover", code: "0", image: `${IMG}/COVER/0 No Cover.webp` },
       { id: "2", label: "#2 Shield", code: "2", image: `${IMG}/COVER/2 Shield.webp` },
-      { 
-        id: "contact-sales", 
-        label: "#0 Contact Sales for More Options", 
-        code: "0",
-        image: `${IMG}/COVER/0 Contact Sales for More Options.png`,
-        notes: "Contact Sales",
-      },
+      //DISABLED: Not in approved sales list
+      // { 
+      //   id: "contact-sales", 
+      //   label: "#0 Contact Sales for More Options", 
+      //   code: "0",
+      //   image: `${IMG}/COVER/0 Contact Sales for More Options.png`,
+      //   notes: "Contact Sales",
+      // },
     ],
   },
 
@@ -64,15 +66,18 @@ const steps: Step[] = [
       { id: "EM", label: "#EM EMERGENCY", code: "EM", image: `${IMG}/TEXT/EM EMERGENCY.webp` },
       { id: "EX", label: "#EX EMERGENCY EXIT", code: "EX", image: `${IMG}/TEXT/EX EMERGENCY EXIT.webp` },
       { id: "PO", label: "#PO EMERGENCY POWER OFF", code: "PO", image: `${IMG}/TEXT/PO EMERGENCY POWER OFF.webp` },
-      { id: "ES", label: "#ES EMERGENCY STOP", code: "ES", image: `${IMG}/TEXT/ES EMERGENCY STOP.webp` },
+      //DISABLED: Not in approved sales list
+      // { id: "ES", label: "#ES EMERGENCY STOP", code: "ES", image: `${IMG}/TEXT/ES EMERGENCY STOP.webp` }, 
       { id: "EV", label: "#EV EVACUATION", code: "EV", image: `${IMG}/TEXT/EV EVACUATION.webp` },
       { id: "XT", label: "#XT EXIT", code: "XT", image: `${IMG}/TEXT/XT EXIT.webp` },
       { id: "PS", label: "#PS FUEL PUMP SHUT-DOWN", code: "PS", image: `${IMG}/TEXT/PS FUEL PUMP SHUT-DOWN.webp` },
       { id: "HV", label: "#HV HVAC SHUT-DOWN", code: "HV", image: `${IMG}/TEXT/HV HVAC SHUT-DOWN.webp` },
       { id: "LD", label: "#LD LOCKDOWN", code: "LD", image: `${IMG}/TEXT/LD LOCKDOWN.webp` },
-      { id: "PL", label: "#PL POLICE", code: "PL", image: `${IMG}/TEXT/PL POLICE.webp` },
-      { id: "PX", label: "#PX PUSH TO EXIT", code: "PX", image: `${IMG}/TEXT/PX PUSH TO EXIT.webp` },
-      { id: "NT", label: "#NT NO TEXT", code: "NT", image: `${IMG}/TEXT/NT NO TEXT.webp` },
+      //DISABLED: Not in approved sales list
+      // { id: "PL", label: "#PL POLICE", code: "PL", image: `${IMG}/TEXT/PL POLICE.webp` },
+      // { id: "PX", label: "#PX PUSH TO EXIT", code: "PX", image: `${IMG}/TEXT/PX PUSH TO EXIT.webp` },
+      // { id: "NT", label: "#NT NO TEXT", code: "NT", image: `${IMG}/TEXT/NT NO TEXT.webp` },
+
       { id: "ZA", label: "#ZA Custom text", code: "ZA", image: `${IMG}/TEXT/ZA Custom text.webp` },
       { id: "RM", label: "#RM Running Man symbol", code: "RM", image: `${IMG}/TEXT/RM Running Man symbol.webp` },
     ],
@@ -84,9 +89,10 @@ const steps: Step[] = [
     required: true,
     options: [
       { id: "EN", label: "#EN English", code: "EN", image: `${IMG}/LANGUAGE/EN English.webp` },
-      { id: "ES", label: "#ES Spanish", code: "ES", image: `${IMG}/LANGUAGE/ES Spanish.webp` },
-      { id: "FR", label: "#FR French", code: "FR", image: `${IMG}/LANGUAGE/FR French.webp` },
-      { id: "ZL", label: "#ZL Custom", code: "ZL", image: `${IMG}/LANGUAGE/ZL Custom.webp` },
+      //DISABLED: Not in approved sales list
+      // { id: "ES", label: "#ES Spanish", code: "ES", image: `${IMG}/LANGUAGE/ES Spanish.webp` },
+      // { id: "FR", label: "#FR French", code: "FR", image: `${IMG}/LANGUAGE/FR French.webp` },
+      // { id: "ZL", label: "#ZL Custom", code: "ZL", image: `${IMG}/LANGUAGE/ZL Custom.webp` },
     ],
   },
 ];
