@@ -1,291 +1,202 @@
-import type {
-  Option,
-  Step,
-  Configuration,
-  ModelDefinition,
-  AvailabilityResult,
-  StepId,
-} from "./types";
-
+import type { Option, Configuration, Step, ModelId, ModelDefinition } from "./types";
+import type { ModelConstraints } from "./rules/types";
+import { createConstraintEngine, getStepAvailability } from "./rules/constraintEngine";
+import { G3_MULTIPURPOSE_PUSH_BUTTON_CONSTRAINTS } from "./rules/G3multipurposepushbuttonrules";
 import {
-  createConstraintEngine,
-  STOPPER_STATIONS_CONSTRAINTS,
-  INDOOR_PUSH_BUTTONS_CONSTRAINTS,
-  KEY_SWITCHES_CONSTRAINTS,
-  WATERPROOF_PUSH_BUTTONS_CONSTRAINTS,
-  RESET_CALL_POINTS_CONSTRAINTS,
-  WATERPROOF_RESET_CALL_POINT_CONSTRAINTS,
-  UNIVERSAL_STOPPER_CONSTRAINTS,
-  LOW_PROFILE_UNIVERSAL_STOPPER_CONSTRAINTS,
-  GLOBAL_RESET_CONSTRAINTS,
-  ENVIRO_STOPPER_CONSTRAINTS,
-  ALERT_POINT_CONSTRAINTS,
-  CALL_POINT_STOPPER_CONSTRAINTS,
-  ENVIRO_ARMOUR_CONSTRAINTS,
-  G3_MULTIPURPOSE_PUSH_BUTTON_CONSTRAINTS,
-  type IConstraintEngine,
-  type ConstraintResult,
-} from "./rules";
+  getValidOptionsForStep as getValidG3Options,
+  type G3SelectionState,
+} from "./rules/G3multipurposepushbuttonrules";
 
-const engineCache = new Map<string, IConstraintEngine>();
+// ============================================================================
+// Constraints registry
+// ============================================================================
 
-function getConstraintEngine(modelId: string): IConstraintEngine | null {
-  if (engineCache.has(modelId)) {
-    return engineCache.get(modelId)!;
-  }
-  
-  switch (modelId) {
-    case "g3-multipurpose-push-button": {
-      const engine = createConstraintEngine(G3_MULTIPURPOSE_PUSH_BUTTON_CONSTRAINTS);
-      engineCache.set(modelId, engine);
-      return engine;
-    }
-    case "low-profile-universal-stopper": {
-      const engine = createConstraintEngine(LOW_PROFILE_UNIVERSAL_STOPPER_CONSTRAINTS);
-      engineCache.set(modelId, engine);
-      return engine;
-    }
-    case "stopper-stations": {
-      const engine = createConstraintEngine(STOPPER_STATIONS_CONSTRAINTS);
-      engineCache.set(modelId, engine);
-      return engine;
-    }
-    case "indoor-push-buttons": {
-      const engine = createConstraintEngine(INDOOR_PUSH_BUTTONS_CONSTRAINTS);
-      engineCache.set(modelId, engine);
-      return engine;
-    }
-    case "key-switches": {
-      const engine = createConstraintEngine(KEY_SWITCHES_CONSTRAINTS);
-      engineCache.set(modelId, engine);
-      return engine;
-    }
-    case "waterproof-push-buttons": {
-      const engine = createConstraintEngine(WATERPROOF_PUSH_BUTTONS_CONSTRAINTS);
-      engineCache.set(modelId, engine);
-      return engine;
-    }
-    case "reset-call-points": {
-      const engine = createConstraintEngine(RESET_CALL_POINTS_CONSTRAINTS);
-      engineCache.set(modelId, engine);
-      return engine;
-    }
-    case "waterproof-reset-call-point": {
-      const engine = createConstraintEngine(WATERPROOF_RESET_CALL_POINT_CONSTRAINTS);
-      engineCache.set(modelId, engine);
-      return engine;
-    }
-    case "universal-stopper": {
-      const engine = createConstraintEngine(UNIVERSAL_STOPPER_CONSTRAINTS);
-      engineCache.set(modelId, engine);
-      return engine;
-    }
-    case "global-reset": {
-      const engine = createConstraintEngine(GLOBAL_RESET_CONSTRAINTS);
-      engineCache.set(modelId, engine);
-      return engine;
-    }
-    case "enviro-stopper": {
-      const engine = createConstraintEngine(ENVIRO_STOPPER_CONSTRAINTS);
-      engineCache.set(modelId, engine);
-      return engine;
-    }
-    case "alert-point": {
-      const engine = createConstraintEngine(ALERT_POINT_CONSTRAINTS);
-      engineCache.set(modelId, engine);
-      return engine;
-    }
-    case "call-point-stopper": {
-      const engine = createConstraintEngine(CALL_POINT_STOPPER_CONSTRAINTS);
-      engineCache.set(modelId, engine);
-      return engine;
-    }
-    case "enviro-armour": {
-      const engine = createConstraintEngine(ENVIRO_ARMOUR_CONSTRAINTS);
-      engineCache.set(modelId, engine);
-      return engine;
-    }
-    default:
-      return null;
-  }
+const CONSTRAINTS_MAP: Record<string, ModelConstraints> = {
+  "g3-multipurpose-push-button": G3_MULTIPURPOSE_PUSH_BUTTON_CONSTRAINTS,
+  // TODO: Add other models as they are migrated to allowlist validation
+};
+
+function getModelConstraints(modelId: ModelId): ModelConstraints | null {
+  return CONSTRAINTS_MAP[modelId] ?? null;
 }
 
-export function checkOptionAvailability(
-  option: Option,
-  config: Configuration,
-  modelId?: string,
-  stepId?: string
-): AvailabilityResult {
-  if (modelId && stepId) {
-    const engine = getConstraintEngine(modelId);
-    if (engine) {
-      const result = engine.checkOptionAvailability(stepId, option.id, config);
-      if (!result.available) {
-        return {
-          available: false,
-          reason: result.reasons.map((r) => r.message).join("; "),
-          blockedBy: result.reasons[0]?.blockedBy,
-        };
-      }
-      return { available: true };
-    }
-  }
-  
-  return checkOptionAvailabilityLegacy(option, config);
-}
-
-function checkOptionAvailabilityLegacy(
-  option: Option,
-  config: Configuration
-): AvailabilityResult {
-  if (!option.availableFor || !option.dependsOn) {
-    return { available: true };
-  }
-
-  const dependencyStepId = option.dependsOn;
-  const selectedValue = config[dependencyStepId];
-
-  if (!selectedValue) {
-    return {
-      available: false,
-      reason: `Requires ${dependencyStepId} selection first`,
-      blockedBy: dependencyStepId,
-    };
-  }
-
-  if (option.availableFor.includes(selectedValue)) {
-    return { available: true };
-  }
-
-  return {
-    available: false,
-    reason: `Not compatible with selected ${dependencyStepId}`,
-    blockedBy: dependencyStepId,
-  };
-}
+// ============================================================================
+// Basic option availability (legacy)
+// ============================================================================
 
 export function isOptionAvailable(
   option: Option,
-  config: Configuration,
-  modelId?: string,
-  stepId?: string
+  config: Configuration
 ): boolean {
-  return checkOptionAvailability(option, config, modelId, stepId).available;
-}
+  if (!option.availableFor) {
+    return true;
+  }
 
-export function getOptionsWithAvailability(
-  step: Step,
-  config: Configuration,
-  modelId?: string
-): Array<{ option: Option; availability: AvailabilityResult }> {
-  return step.options.map((option) => ({
-    option,
-    availability: checkOptionAvailability(option, config, modelId, step.id),
-  }));
+  if (!config.colour) {
+    return false;
+  }
+
+  return option.availableFor.includes(config.colour);
 }
 
 export function filterAvailableOptions(
   options: Option[],
-  config: Configuration,
-  modelId?: string,
-  stepId?: string
+  config: Configuration
 ): Option[] {
-  return options.filter((option) => 
-    isOptionAvailable(option, config, modelId, stepId)
-  );
-}
-
-export function countAvailableOptions(
-  step: Step,
-  config: Configuration,
-  modelId?: string
-): number {
-  return step.options.filter((opt) => 
-    isOptionAvailable(opt, config, modelId, step.id)
-  ).length;
+  return options.filter((option) => isOptionAvailable(option, config));
 }
 
 export function isSelectionStillValid(
   optionId: string | null,
-  step: Step,
-  config: Configuration,
-  modelId?: string
+  options: Option[],
+  config: Configuration
 ): boolean {
   if (!optionId) {
     return true;
   }
 
-  const option = step.options.find((o) => o.id === optionId);
+  const option = options.find((o) => o.id === optionId);
+
   if (!option) {
     return false;
   }
 
-  return isOptionAvailable(option, config, modelId, step.id);
+  return isOptionAvailable(option, config);
 }
 
-export function findInvalidSelections(
-  model: ModelDefinition,
-  config: Configuration
-): StepId[] {
-  const invalid: StepId[] = [];
+// ============================================================================
+// Allowlist validation for G3 model
+// ============================================================================
 
-  const engine = getConstraintEngine(model.id);
-  if (engine) {
-    return engine.validateConfiguration(config);
-  }
-
-  for (const step of model.steps) {
-    const selectedId = config[step.id];
-    if (selectedId && !isSelectionStillValid(selectedId, step, config, model.id)) {
-      invalid.push(step.id);
-    }
-  }
-
-  return invalid;
+function configToG3Selection(config: Configuration): G3SelectionState {
+  return {
+    model: config.model ?? undefined,
+    colour: config.colour ?? undefined,
+    cover: config.cover ?? undefined,
+    buttonType: config.buttonType ?? undefined,
+    text: config.text ?? undefined,
+    language: config.language ?? undefined,
+  };
 }
 
-export function getSelectionsToReset(
-  model: ModelDefinition,
-  changedStepId: StepId,
-  config: Configuration
-): StepId[] {
-  const toReset: StepId[] = [];
+function isG3Model(modelId: ModelId): boolean {
+  return modelId === "g3-multipurpose-push-button";
+}
 
-  const engine = getConstraintEngine(model.id);
+/**
+ * Gets valid options for a step, applying allowlist validation for G3 model.
+ * Returns Set of valid option IDs.
+ */
+function getG3AllowlistValidOptions(
+  stepId: string,
+  config: Configuration
+): Set<string> | null {
+  const g3Selection = configToG3Selection(config);
   
-  for (const step of model.steps) {
-    if (step.id === changedStepId) {
-      continue;
-    }
-
-    const selectedId = config[step.id];
-    if (!selectedId) {
-      continue;
-    }
-
-    let isValid: boolean;
-    
-    if (engine) {
-      const result = engine.checkOptionAvailability(step.id, selectedId, config);
-      isValid = result.available;
-    } else {
-      isValid = isSelectionStillValid(selectedId, step, config, model.id);
-    }
-
-    if (!isValid) {
-      toReset.push(step.id);
-    }
-  }
-
-  return toReset;
+  // Remove the current step from selections to get "other" selections
+  const { [stepId as keyof G3SelectionState]: _, ...otherSelections } = g3Selection;
+  
+  const validOptions = getValidG3Options(
+    stepId as keyof G3SelectionState,
+    otherSelections
+  );
+  
+  return new Set(validOptions);
 }
+
+// ============================================================================
+// Enhanced option availability with constraint engine + allowlist
+// ============================================================================
+
+export interface OptionAvailabilityResult {
+  available: boolean;
+  reason?: string;
+}
+
+export interface OptionWithAvailability {
+  option: Option;
+  availability: OptionAvailabilityResult;
+}
+
+/**
+ * Gets all options for a step with their availability status.
+ * Combines constraint matrix checks with allowlist validation for G3 model.
+ */
+export function getOptionsWithAvailability(
+  step: Step,
+  config: Configuration,
+  modelId: ModelId
+): OptionWithAvailability[] {
+  const constraints = getModelConstraints(modelId);
+  
+  // If no constraints defined, all options are available
+  if (!constraints) {
+    return step.options.map((option) => ({
+      option,
+      availability: { available: true },
+    }));
+  }
+  
+  const engine = createConstraintEngine(constraints);
+  const allOptionIds = step.options.map((o) => o.id);
+  const stepAvailability = getStepAvailability(engine, step.id, allOptionIds, config);
+  
+  // For G3 model, also apply allowlist validation
+  const g3AllowlistValid = isG3Model(modelId)
+    ? getG3AllowlistValidOptions(step.id, config)
+    : null;
+  
+  return step.options.map((option) => {
+    const constraintResult = stepAvailability.options.find(
+      (o) => o.optionId === option.id
+    );
+    
+    // Check constraint matrix
+    if (constraintResult && !constraintResult.available) {
+      const reason = constraintResult.reasons.length > 0
+        ? constraintResult.reasons[0].message
+        : "Not available with current configuration";
+      return {
+        option,
+        availability: { available: false, reason },
+      };
+    }
+    
+    // Check G3 allowlist (only if constraint passed)
+    if (g3AllowlistValid && !g3AllowlistValid.has(option.id)) {
+      return {
+        option,
+        availability: {
+          available: false,
+          reason: "This option does not lead to a valid product model",
+        },
+      };
+    }
+    
+    return {
+      option,
+      availability: { available: true },
+    };
+  });
+}
+
+// ============================================================================
+// Configuration completeness
+// ============================================================================
 
 export function isConfigurationComplete(
   model: ModelDefinition,
   config: Configuration
 ): boolean {
-  for (const step of model.steps) {
-    if (step.required && !config[step.id]) {
+  for (const stepId of model.stepOrder) {
+    const step = model.steps.find((s) => s.id === stepId);
+    if (!step) continue;
+    
+    // Skip non-required steps
+    if (!step.required) continue;
+    
+    const selection = config[stepId];
+    if (!selection) {
       return false;
     }
   }
@@ -295,33 +206,95 @@ export function isConfigurationComplete(
 export function getMissingRequiredSteps(
   model: ModelDefinition,
   config: Configuration
-): StepId[] {
-  return model.steps
-    .filter((step) => step.required && !config[step.id])
-    .map((step) => step.id);
+): string[] {
+  const missing: string[] = [];
+  
+  for (const stepId of model.stepOrder) {
+    const step = model.steps.find((s) => s.id === stepId);
+    if (!step) continue;
+    
+    // Skip non-required steps
+    if (!step.required) continue;
+    
+    const selection = config[stepId];
+    if (!selection) {
+      missing.push(stepId);
+    }
+  }
+  
+  return missing;
 }
 
 export function getCompletionPercentage(
   model: ModelDefinition,
   config: Configuration
 ): number {
-  const requiredSteps = model.steps.filter((s) => s.required);
+  const requiredSteps = model.stepOrder.filter((stepId) => {
+    const step = model.steps.find((s) => s.id === stepId);
+    return step && step.required;
+  });
+  
   if (requiredSteps.length === 0) return 100;
-
-  const completedCount = requiredSteps.filter((s) => config[s.id]).length;
+  
+  const completedCount = requiredSteps.filter(
+    (stepId) => config[stepId] !== null && config[stepId] !== undefined
+  ).length;
+  
   return Math.round((completedCount / requiredSteps.length) * 100);
 }
 
-export function debugOptionAvailability(
-  modelId: string,
-  stepId: StepId,
-  optionId: string,
-  config: Configuration
-): ConstraintResult | null {
-  const engine = getConstraintEngine(modelId);
-  if (!engine) {
-    return null;
-  }
-  return engine.checkOptionAvailability(stepId, optionId, config);
-}
+// ============================================================================
+// Selection reset logic
+// ============================================================================
 
+/**
+ * Returns list of step IDs that should be reset when a step selection changes.
+ * This is needed when changing an earlier step invalidates later selections.
+ */
+export function getSelectionsToReset(
+  model: ModelDefinition,
+  changedStepId: string,
+  newConfig: Configuration
+): string[] {
+  const toReset: string[] = [];
+  const constraints = getModelConstraints(model.id);
+  
+  if (!constraints) {
+    return toReset;
+  }
+  
+  const engine = createConstraintEngine(constraints);
+  const changedStepIndex = model.stepOrder.indexOf(changedStepId);
+  
+  // Check all steps after the changed step
+  for (let i = changedStepIndex + 1; i < model.stepOrder.length; i++) {
+    const stepId = model.stepOrder[i];
+    const currentSelection = newConfig[stepId];
+    
+    if (!currentSelection) continue;
+    
+    const result = engine.checkOptionAvailability(stepId, currentSelection, newConfig);
+    
+    if (!result.available) {
+      toReset.push(stepId);
+    }
+  }
+  
+  // For G3 model, also check if selection leads to invalid model
+  if (isG3Model(model.id)) {
+    for (let i = changedStepIndex + 1; i < model.stepOrder.length; i++) {
+      const stepId = model.stepOrder[i];
+      if (toReset.includes(stepId)) continue;
+      
+      const currentSelection = newConfig[stepId];
+      if (!currentSelection) continue;
+      
+      const validOptions = getG3AllowlistValidOptions(stepId, newConfig);
+      if (validOptions && !validOptions.has(currentSelection)) {
+        toReset.push(stepId);
+      }
+    }
+  }
+  
+  return toReset;
+}

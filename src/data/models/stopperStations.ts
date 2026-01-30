@@ -23,15 +23,14 @@ const steps: Step[] = [
     required: true,
     options: [
       { id: "0", label: "#0 No Cover", code: "0", image: `${IMG}/COVER/0-No-Cover.webp` },
-      { id: "2", label: "#2 Shield", code: "2", image: `${IMG}/COVER/2-Shield.webp` },
-      { 
-        id: "contact-sales", 
-        label: "#0 Contact Sales for More Options", 
-        code: "0",
-        image: `${IMG}/COVER/0-Contact-Sales.png`,
-        // TODO: This option should trigger contact form or redirect, not add to Product Model
-        notes: "Contact Sales",
-      },
+      // { id: "2", label: "#2 Shield", code: "2", image: `${IMG}/COVER/2-Shield.webp` },
+      // { 
+      //   id: "contact-sales", 
+      //   label: "#0 Contact Sales for More Options", 
+      //   code: "0",
+      //   image: `${IMG}/COVER/0-Contact-Sales.png`,
+      //   notes: "Contact Sales",
+      // },
     ],
   },
   {
@@ -121,14 +120,14 @@ const steps: Step[] = [
         notes: "EXTENDED LEAD TIMES",
         availableFor: ["1", "3"],
       },
-      {
-        id: "7-blue",
-        label: "#7 Weather Resistant Blue Illuminated",
-        code: "7",
-        image: `${IMG}/ACTIVATION/7 Weather Resistant Blue Illuminated EXTENDED LEAD TIMES.webp`,
-        notes: "EXTENDED LEAD TIMES",
-        availableFor: ["3", "4"],
-      },
+      // {
+      //   id: "7-blue",
+      //   label: "#7 Weather Resistant Blue Illuminated",
+      //   code: "7",
+      //   image: `${IMG}/ACTIVATION/7 Weather Resistant Blue Illuminated EXTENDED LEAD TIMES.webp`,
+      //   notes: "EXTENDED LEAD TIMES",
+      //   availableFor: ["3", "4"],
+      // },
       {
         id: "8",
         label: "#8 Pneumatic Illuminates green, red or white",
@@ -175,8 +174,8 @@ const steps: Step[] = [
     required: true,
     options: [
       { id: "EN", label: "#EN English", code: "EN", image: `${IMG}/LANGUAGE/EN-English.webp` },
-      { id: "ES", label: "#ES Spanish", code: "ES", image: `${IMG}/LANGUAGE/ES-Spanish.webp` },
-      { id: "FR", label: "#FR French", code: "FR", image: `${IMG}/LANGUAGE/FR-French.webp` },
+      // { id: "ES", label: "#ES Spanish", code: "ES", image: `${IMG}/LANGUAGE/ES-Spanish.webp` },
+      // { id: "FR", label: "#FR French", code: "FR", image: `${IMG}/LANGUAGE/FR-French.webp` },
       { id: "ZL", label: "#ZL NON-RETURNABLE other language", code: "ZL", image: `${IMG}/LANGUAGE/ZL-NON-RETURNABLE.webp` },
     ],
   },

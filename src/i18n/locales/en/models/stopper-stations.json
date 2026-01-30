@@ -20,8 +20,7 @@
     "cover": {
       "title": "COVER",
       "options": {
-        "0": "#0 No Cover",
-        "2": "#2 Shield"
+        "0": "#0 No Cover"
       }
     },
     "activation": {
@@ -38,7 +37,6 @@
         "6-blue": "#6 Blue Illuminated",
         "7-red": "#7 Weather Resistant Momentary Illuminated Red",
         "7-green": "#7 Weather Resistant Green Illuminated",
-        "7-blue": "#7 Weather Resistant Blue Illuminated",
         "8": "#8 Pneumatic Illuminates green, red or white",
         "9": "#9 Turn-to-Reset Illuminates green, red or white"
       }
@@ -66,7 +64,6 @@
       "options": {
         "EN": "#EN English",
         "ES": "#ES Spanish",
-        "FR": "#FR French",
         "ZL": "#ZL NON-RETURNABLE other language"
       }
     },

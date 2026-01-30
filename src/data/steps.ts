@@ -2,6 +2,16 @@ import type { Step } from "../types";
 
 export const STEPS: Step[] = [
   {
+    id: "camera",
+    title: "CAMERA",
+    required: true,
+    options: [
+      { id: "A", label: "#A No Camera", code: "A" },
+      { id: "C", label: "#C 5MP Camera", code: "C" },
+    ],
+  },
+
+  {
     id: "colour",
     title: "COLOUR",
     required: true,
@@ -143,6 +153,7 @@ export const STEPS: Step[] = [
       { id: "PX", label: "#PX PUSH TO EXIT", code: "PX" },
       { id: "NT", label: "#NT NO TEXT, blank button and/or cover", code: "NT" },
       { id: "ZA", label: "#ZA NON-RETURNABLE custom text", code: "ZA" },
+      { id: "RM", label: "#RM Emergency Exit Pictogram", code: "RM" },
     ],
   },
 
@@ -151,10 +162,10 @@ export const STEPS: Step[] = [
     title: "LANGUAGE",
     required: true,
     options: [
-      { id: "EN", label: "#EN English", code: "EN" },
-      { id: "ES", label: "#ES Spanish", code: "ES" },
-      { id: "FR", label: "#FR French", code: "FR" },
-      { id: "ZL", label: "#ZL NON-RETURNABLE other language", code: "ZL" },
+      { id: "EN", label: "#EN English", code: "EN", image: "/G3 Multipurpose Push Button/LANGUAGE/EN English.webp" },
+      { id: "ES", label: "#ES Spanish", code: "ES", image: "/G3 Multipurpose Push Button/LANGUAGE/ES Spanish.webp" },
+      { id: "FR", label: "#FR French", code: "FR", image: "/G3 Multipurpose Push Button/LANGUAGE/FR French.webp" },
+      { id: "ZL", label: "#ZL NON-RETURNABLE other language", code: "ZL", image: "/G3 Multipurpose Push Button/LANGUAGE/ZL Other Language.webp" },
     ],
   },
   {

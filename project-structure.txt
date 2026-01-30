@@ -93,6 +93,7 @@
         📄 common.json
         📁 modelDescriptions
           📄 g3-multipurpose-push-button.json
+          📄 stopper-stations.json
         📁 models
           📄 alert-point.json
           📄 call-point-stopper.json
@@ -115,6 +116,7 @@
         📄 common.json
         📁 modelDescriptions
           📄 g3-multipurpose-push-button.json
+          📄 stopper-stations.json
         📁 models
           📄 alert-point.json
           📄 call-point-stopper.json
@@ -148,6 +150,7 @@
     📄 constraintEngine.ts
     📄 enviroArmourRules.ts
     📄 enviroStopperRules.ts
+    📄 G3multipurposepushbuttonrules.ts
     📄 globalResetRules.ts
     📄 index.ts
     📄 indoorPushButtonsRules.ts
